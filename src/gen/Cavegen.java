@@ -1,10 +1,11 @@
+package gen;
 import java.awt.Color;
 import java.awt.Graphics;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class Terraingen {
+public class Cavegen {
 
 	int width, height;
 
@@ -12,7 +13,7 @@ public class Terraingen {
 	private boolean[][] cellmap;
 	private int deathLimit, birthLimit, numberOfSteps;
 
-	public Terraingen(int width, int height, float bdRatio, int birthLimit, int deathLimit, int numberOfSteps) {
+	public Cavegen(int width, int height, float bdRatio, int birthLimit, int deathLimit, int numberOfSteps) {
 		this.bdRatio = bdRatio;
 		this.deathLimit = deathLimit;
 		this.birthLimit = birthLimit;
@@ -21,6 +22,7 @@ public class Terraingen {
 		this.height = height;
 		this.cellmap = new boolean[width][height];
 		generateMap();
+		show(5);
 	}
 
 	private void generateMap() {
@@ -58,7 +60,7 @@ public class Terraingen {
 		return count;
 	}
 
-	private boolean[][] getCellmap() {
+	public boolean[][] getCellmap() {
 		return cellmap;
 	}
 
@@ -102,7 +104,7 @@ public class Terraingen {
 	}
 
 	public void show(int pixelSize) {
-		DisplayBin disp = new DisplayBin(this, pixelSize);
+		DisplayCaves disp = new DisplayCaves(this, pixelSize);
 	}
 
 	@Override
@@ -120,11 +122,11 @@ public class Terraingen {
 		return str;
 	}
 
-	private class DisplayBin extends JFrame {
+	private class DisplayCaves extends JFrame {
 
 		int x, y;
 
-		public DisplayBin(Terraingen tg, int cellSize) {
+		public DisplayCaves(Cavegen tg, int cellSize) {
 			this.x = tg.getCellmap().length;
 			this.y = tg.getCellmap()[0].length;
 			this.setTitle("2D Cellular automate");
