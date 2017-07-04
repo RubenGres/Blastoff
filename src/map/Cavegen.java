@@ -1,4 +1,4 @@
-package gen;
+package map;
 import java.awt.Color;
 import java.awt.Graphics;
 
@@ -22,7 +22,7 @@ public class Cavegen {
 		this.height = height;
 		this.cellmap = new boolean[width][height];
 		generateMap();
-		show(5);
+		show(3);
 	}
 
 	private void generateMap() {
@@ -133,8 +133,7 @@ public class Cavegen {
 			this.setContentPane(new Panel(tg.getCellmap(), cellSize));
 			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			this.setResizable(false);
-			this.setSize(x * cellSize, y * cellSize + cellSize);
-			this.setLocationRelativeTo(null);
+			this.setSize(x * cellSize, y * cellSize + 28);
 			this.setVisible(true);
 			this.isAlwaysOnTop();
 		}
