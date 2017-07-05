@@ -10,6 +10,7 @@ public class Cell {
 	public static Cell emptyCell = new EmptyCell(0);
 	public static Cell stoneCell = new StoneCell(1);
 	public static Cell bedrockCell = new BedrockCell(2);
+	public static Cell dirtCell = new DirtCell(3);
 	
 	public static final int CELLWIDTH = 4, CELLHEIGHT = 4;
 	

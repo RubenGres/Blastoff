@@ -10,7 +10,7 @@ import map.*;
 public class Main {
 
 	public static void main(String[] args){
-		Game game = new Game("Hey", 400, 400);
+		Game game = new Game("Nice map bruh", 400, 400);
 		game.start();
 	}
 

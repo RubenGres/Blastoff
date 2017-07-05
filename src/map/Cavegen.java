@@ -9,12 +9,12 @@ public class Cavegen {
 
 	int width, height;
 
-	private float bdRatio;
+	private float percentFilled;
 	private boolean[][] cellmap;
 	private int deathLimit, birthLimit, numberOfSteps;
 
-	public Cavegen(int width, int height, float bdRatio, int birthLimit, int deathLimit, int numberOfSteps) {
-		this.bdRatio = bdRatio;
+	public Cavegen(int width, int height, float percentFilled, int birthLimit, int deathLimit, int numberOfSteps) {
+		this.percentFilled = percentFilled;
 		this.deathLimit = deathLimit;
 		this.birthLimit = birthLimit;
 		this.numberOfSteps = numberOfSteps;
@@ -22,7 +22,6 @@ public class Cavegen {
 		this.height = height;
 		this.cellmap = new boolean[width][height];
 		generateMap();
-		show(3);
 	}
 
 	private void generateMap() {
@@ -99,7 +98,7 @@ public class Cavegen {
 	private void init() {
 		for (int x = 0; x < width; x++)
 			for (int y = 0; y < height; y++)
-				if (Math.random() < bdRatio)
+				if (Math.random() < percentFilled)
 					cellmap[x][y] = true;
 	}
 
