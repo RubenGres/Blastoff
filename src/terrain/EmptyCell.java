@@ -9,4 +9,8 @@ public class EmptyCell extends Cell{
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
+	public boolean isSolid(){
+		return false;
+	}
 }

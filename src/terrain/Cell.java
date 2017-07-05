@@ -1,12 +1,14 @@
 package terrain;
 import java.awt.Color;
 import java.awt.Graphics;
+import terrain.liquid.*;
 
-public class Cell {
+public abstract class Cell {
 	
 	//STATIC
 	public static Cell[] cells = new Cell[256];
 
+	//solid
 	public static Cell emptyCell = new EmptyCell(0);
 	public static Cell dirtCell = new DirtCell(1);
 	public static Cell gravelCell = new GravelCell(2);
@@ -14,6 +16,9 @@ public class Cell {
 	public static Cell stoneCell = new StoneCell(4);
 	public static Cell bedrockCell = new BedrockCell(5);
 	public static Cell sandCell = new SandCell(6);
+	
+	//liquid
+	public static Cell lavaCell = new LavaCell(20);
 	
 	public static final int CELLWIDTH = 4, CELLHEIGHT = 4;
 	
@@ -34,7 +39,7 @@ public class Cell {
 	
 	// hitbox
 	public boolean isSolid(){
-		return false;
+		return true;
 	}
 	
 	public int getId(){

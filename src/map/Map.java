@@ -22,7 +22,7 @@ public class Map {
 		float percentFilled = 0.47f; // Percentage of filled cell
 		int birth = 3; // Lives if more than x neighbors
 		int death = 2; // Dies if less than x neighbors
-		int iteration = 3; // Number of iterations
+		int iteration = 2; // Number of iterations
 		this.cv = new Cavegen(width, height - surfaceHeight, percentFilled, birth, death, iteration);
 	}
 
@@ -33,21 +33,30 @@ public class Map {
 		for (int y = surfaceHeight; y < this.height; y++)
 			for (int x = 0; x < this.width; x++) {
 				if (cv.getCellmap()[x][y - surfaceHeight])
-					this.map[x][y] = 1;
+					this.map[x][y] = Cell.stoneCell.getId();
 				else
-					this.map[x][y] = 0;
+					this.map[x][y] = Cell.emptyCell.getId();
 			}
 		
-		addLayer(surfaceHeight, height, Cell.stoneCell, 0);
+		addLava(height - 10);
+		
+		//addLayer(surfaceHeight, height, Cell.stoneCell, 0);
 		addLayer(surfaceHeight, height - 20, Cell.cobbleCell, 4);
-		addLayer(surfaceHeight, height - 40, Cell.gravelCell, 4);
-		addLayer(surfaceHeight, height - 60, Cell.dirtCell, 4);
-		addLayer(surfaceHeight, surfaceHeight + 15, Cell.sandCell, 4);
+		addLayer(surfaceHeight, height - 40, Cell.gravelCell, 6);
+		addLayer(surfaceHeight, height - 60, Cell.dirtCell, 8);
+		addLayer(surfaceHeight, surfaceHeight + 15, Cell.sandCell, 15);
 		addBedrock();
 
 		cv = null;
 	}
 
+	private void addLava(int yStart){
+		for(int y = yStart; y < height; y++)
+			for(int x = 0; x < width; x++)
+				if(this.map[x][y] == Cell.emptyCell.getId())
+					this.map[x][y] = Cell.lavaCell.getId();
+	}
+	
 	private void addBedrock() {
 		for (int x = 0; x < this.width; x++)
 			this.map[x][height - 1] = Cell.bedrockCell.getId();
