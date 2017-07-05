@@ -2,6 +2,7 @@ package terrain;
 import java.awt.Color;
 import java.awt.Graphics;
 import terrain.liquid.*;
+import terrain.ore.GoldCell;
 
 public abstract class Cell {
 	
@@ -19,6 +20,9 @@ public abstract class Cell {
 	
 	//liquid
 	public static Cell lavaCell = new LavaCell(20);
+	
+	//ore
+	public static Cell goldCell = new GoldCell(30);
 	
 	public static final int CELLWIDTH = 4, CELLHEIGHT = 4;
 	
