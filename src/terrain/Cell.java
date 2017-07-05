@@ -20,6 +20,7 @@ public abstract class Cell {
 	
 	//liquid
 	public static Cell lavaCell = new LavaCell(20);
+	public static Cell waterCell = new WaterCell(21);
 	
 	//ore
 	public static Cell goldCell = new GoldCell(30);

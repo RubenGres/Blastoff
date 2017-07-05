@@ -32,18 +32,19 @@ public class Map {
 		for (int y = surfaceHeight; y < this.height; y++)
 			for (int x = 0; x < this.width; x++) {
 				if (cv.getCellmap()[x][y - surfaceHeight])
-					this.map[x][y] = Cell.stoneCell.getId();
+					this.map[x][y] = Cell.bedrockCell.getId();
 				else
 					this.map[x][y] = Cell.emptyCell.getId();
 			}
 		
-		addLava(height - 10);
 		
-		//addLayer(surfaceHeight, height, Cell.stoneCell, 0);
+		addLayer(surfaceHeight, height -2 , Cell.stoneCell, 4);
 		addLayer(surfaceHeight, height - 20, Cell.cobbleCell, 4);
 		addLayer(surfaceHeight, height - 40, Cell.gravelCell, 6);
 		addLayer(surfaceHeight, height - 60, Cell.dirtCell, 8);
 		addLayer(surfaceHeight, surfaceHeight + 15, Cell.sandCell, 15);
+		addLava(height - 10);
+		//addWater(surfaceHeight);
 		addBedrock();
 
 		cv = null;
@@ -56,9 +57,17 @@ public class Map {
 					this.map[x][y] = Cell.lavaCell.getId();
 	}
 	
+	private void addWater(int yStart){
+		for(int y = yStart; y <  height - 80; y++)
+			for(int x = 0; x < width; x++)
+				if(this.map[x][y] == Cell.emptyCell.getId())
+					this.map[x][y] = Cell.waterCell.getId();
+	}
+	
 	private void addBedrock() {
 		for (int x = 0; x < this.width; x++)
 			this.map[x][height - 1] = Cell.bedrockCell.getId();
+
 	}
 
 	private void transition(int depth, int size, int from, float[] progressionPercentage) {
