@@ -37,8 +37,12 @@ public class Map {
 				else
 					this.map[x][y] = 0;
 			}
-
-		addDirt(20);
+		
+		addLayer(surfaceHeight, height, Cell.stoneCell, 0);
+		addLayer(surfaceHeight, height - 20, Cell.cobbleCell, 4);
+		addLayer(surfaceHeight, height - 40, Cell.gravelCell, 4);
+		addLayer(surfaceHeight, height - 60, Cell.dirtCell, 4);
+		addLayer(surfaceHeight, surfaceHeight + 15, Cell.sandCell, 4);
 		addBedrock();
 
 		cv = null;
@@ -46,27 +50,36 @@ public class Map {
 
 	private void addBedrock() {
 		for (int x = 0; x < this.width; x++)
-			this.map[x][height - 1] = 2;
+			this.map[x][height - 1] = Cell.bedrockCell.getId();
 	}
 
-	private void transition(int depth, int size, int from, int to, float[] progressionPercentage) {
+	private void transition(int depth, int size, int from, float[] progressionPercentage) {
 		for (int y = depth; y < depth + size; y++)
 			for (int x = 0; x < width; x++)
 				if (this.map[x][y] != 0)
 					if (Math.random() < progressionPercentage[y - depth])
 						this.map[x][y] = from;
-					else
-						this.map[x][y] = to;
 	}
 
-	private void addDirt(int size) {
-		for (int y = surfaceHeight; y < surfaceHeight + size; y++)
+	/**
+	 * Fills a layer with a particular cell and a transitions to the next layer at the bottom
+	 * @param y1 Smaller height value of the layer
+	 * @param y2 Biggest height value of the layer
+	 * @param cell Cell to fill the layer with
+	 * @param transitionSize Number of lines the transitions will take (included in the layer)
+	 */
+	private void addLayer(int y1, int y2, Cell cell, int transitionSize) {
+		int cellId = cell.getId();
+		float[] a = new float[transitionSize];
+		for (int i = 0; i < transitionSize; i++) {
+			a[i] = 1.6f / i;
+		}
+		for (int y = y1; y < y2 - a.length; y++)
 			for (int x = 0; x < this.width; x++)
 				if (this.map[x][y] != 0)
-					this.map[x][y] = 3;
-		
-		float[] a = {0.8f ,0.5f, 0.3f, 0.1f, 0.05f};
-		transition(surfaceHeight + size - a.length, a.length, 3, 1, a);
+					this.map[x][y] = cellId;
+
+		transition(y2 - a.length, a.length, cellId, a);
 	}
 
 	public void render(Graphics g) {
