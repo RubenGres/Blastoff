@@ -5,28 +5,27 @@ import java.awt.Graphics;
 import terrain.Cell;
 
 public class Map {
-
-	Cavegen cv;
+	
 	int height, width;
 	int[][] map;
-	int surfaceHeight = 5;
+	int surfaceHeight = 10;
 
 	public Map(int width, int height) {
 		this.height = height;
 		this.width = width;
-		this.initCv();
-		this.generateMap();
+		Cavegen cv = this.initCv();
+		this.generateMap(cv);
 	}
 
-	private void initCv() {
+	private Cavegen initCv() {
 		float percentFilled = 0.47f; // Percentage of filled cell
 		int birth = 3; // Lives if more than x neighbors
 		int death = 2; // Dies if less than x neighbors
 		int iteration = 2; // Number of iterations
-		this.cv = new Cavegen(width, height - surfaceHeight, percentFilled, birth, death, iteration);
+		return new Cavegen(width, height - surfaceHeight, percentFilled, birth, death, iteration);
 	}
 
-	private void generateMap() {
+	private void generateMap(Cavegen cv) {
 
 		this.map = new int[width][height];
 
