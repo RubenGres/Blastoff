@@ -19,6 +19,7 @@ public abstract class Cell {
 	
 	//liquid
 	public static Cell lavaCell = new LavaCell(20);
+	public static Cell waterCell = new WaterCell(21);
 	
 	public static final int CELLWIDTH = 4, CELLHEIGHT = 4;
 	
