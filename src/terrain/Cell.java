@@ -30,10 +30,14 @@ public abstract class Cell {
 	protected Color color;
 	protected final int id;
 	
+	/***
+	 * Constructor
+	 * @param color
+	 * @param id
+	 */
 	public Cell(Color color, int id){
 		this.color = color;
 		this.id = id;
-		
 		cells[id] = this;
 	}
 	
