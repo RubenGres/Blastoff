@@ -37,7 +37,6 @@ public class Map {
 					this.map[x][y] = Cell.emptyCell.getId();
 			}
 		
-		
 		addLayer(surfaceHeight, height -2 , Cell.stoneCell, 4);
 		addLayer(surfaceHeight, height - 20, Cell.cobbleCell, 4);
 		addLayer(surfaceHeight, height - 40, Cell.gravelCell, 6);
@@ -49,7 +48,7 @@ public class Map {
 
 		cv = null;
 	}
-
+	
 	private void addLava(int yStart){
 		for(int y = yStart; y < height; y++)
 			for(int x = 0; x < width; x++)
