@@ -17,6 +17,7 @@ public abstract class Cell {
 	public static Cell stoneCell = new StoneCell(4);
 	public static Cell bedrockCell = new BedrockCell(5);
 	public static Cell sandCell = new SandCell(6);
+	public static Cell grassCell = new GrassCell(7);
 	
 	//liquid
 	public static Cell lavaCell = new LavaCell(20);

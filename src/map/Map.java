@@ -2,6 +2,8 @@ package map;
 
 import java.awt.Graphics;
 
+import org.j3d.texture.procedural.PerlinNoiseGenerator;
+
 import terrain.Cell;
 
 public class Map {
@@ -37,6 +39,7 @@ public class Map {
 					this.map[x][y] = Cell.emptyCell.getId();
 			}
 		
+		
 		addLayer(surfaceHeight, height -2 , Cell.stoneCell, 4);
 		addLayer(surfaceHeight, height - 20, Cell.cobbleCell, 4);
 		addLayer(surfaceHeight, height - 40, Cell.gravelCell, 6);
@@ -45,8 +48,43 @@ public class Map {
 		addLava(height - 10);
 		//addWater(surfaceHeight);
 		addBedrock();
-
+		
+		addSurfaceLayer(Cell.grassCell);
 		cv = null;
+	}
+
+	private void addSurfaceLayer(Cell cell){
+		PerlinNoiseGenerator pnl = new PerlinNoiseGenerator(100);
+		for(int x = 0; x < width; x++){
+			float noise = pnl.noise1(((float) x)/5);
+			int y = (int) (((noise + 1)/2)*10);
+			this.map[x][y + this.surfaceHeight - 5] = cell.getId();
+		}
+		cleanSurfaceLayer(cell);
+		
+	}
+	
+	private void cleanSurfaceLayer(Cell surfaceCell){
+		for(int x = 0; x < width; x++){
+			
+			int y = 0;
+			//localize height of the surfaceLayer on x
+			while(map[x][y] != surfaceCell.getId())
+				y++;
+			
+			int a = 1;
+			while(map[x][y - a] != 0){
+				map[x][y-a] = 0;
+				a++;
+			}
+			
+			a = 1;
+			while(map[x][y + a] == 0){
+				map[x][y+a] = Cell.sandCell.getId();
+				a++;
+			}
+			
+		}
 	}
 	
 	private void addLava(int yStart){
