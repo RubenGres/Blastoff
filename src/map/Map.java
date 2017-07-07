@@ -1,16 +1,14 @@
 package map;
 
 import java.awt.Graphics;
-
 import org.j3d.texture.procedural.PerlinNoiseGenerator;
-
 import terrain.Cell;
 
 public class Map {
 
 	public int height, width;
 	public int[][] map;
-	private int surfaceHeight = 2;
+	private int surfaceHeight = 15;
 
 	private int highestPoint;
 
@@ -46,11 +44,11 @@ public class Map {
 		this.highestPoint = this.getHighestPoint(Cell.grassCell);
 
 		// Adding layers
-		addLayer(0, height - 6, Cell.stoneCell, 5);
+		addLayer(0, height - 7, Cell.stoneCell, 5);
 		addLayer(0, height - 20, Cell.cobbleCell, 5);
 		addLayer(0, height - 40, Cell.gravelCell, 5);
 		addLayer(0, height - 60, Cell.dirtCell, 5);
-		addLayer(0, this.highestPoint + 5, Cell.sandCell, 5);
+		addLayer(0, this.highestPoint + 15, Cell.sandCell, 10);
 
 		addLavaToBottom(height - 10);
 		addBedrock(); // just to be sure
@@ -61,7 +59,6 @@ public class Map {
 	}
 
 	private int getHighestPoint(Cell c) {
-		int[] heights = new int[width];
 		int min = 0;
 		for (int i = 0; i < width; i++) {
 			int height = getFirstCellOccurence(i, c);
@@ -79,7 +76,7 @@ public class Map {
 		for (int x = 0; x < width; x++) {
 			float noise = pnl.noise1(((float) x) / zoom);
 			int y = (int) (((noise + 1) / 2) * amplitude);
-			this.map[x][y] = cell.getId();
+			this.map[x][y + this.surfaceHeight] = cell.getId();
 		}
 	}
 
@@ -109,13 +106,6 @@ public class Map {
 			for (int x = 0; x < width; x++)
 				if (this.map[x][y] == Cell.emptyCell.getId())
 					this.map[x][y] = Cell.lavaCell.getId();
-	}
-
-	private void addWater(int yStart) {
-		for (int y = yStart; y < height - 80; y++)
-			for (int x = 0; x < width; x++)
-				if (this.map[x][y] == Cell.emptyCell.getId())
-					this.map[x][y] = Cell.waterCell.getId();
 	}
 
 	private void addBedrock() {
@@ -181,7 +171,7 @@ public class Map {
 		return y;
 	}
 
-	public void render(Graphics g) {
+	public void render(Graphics g) {		
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
 				Cell.getCellById(this.map[x][y]).render(g, x * Cell.CELLWIDTH, y * Cell.CELLHEIGHT);

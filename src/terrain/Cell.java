@@ -26,7 +26,7 @@ public abstract class Cell {
 	//ore
 	public static Cell goldCell = new GoldCell(30);
 	
-	public static final int CELLWIDTH = 4, CELLHEIGHT = 4;
+	public static final int CELLWIDTH = 16, CELLHEIGHT = 16;
 	
 	//CLASS
 	protected Color color;

@@ -1,12 +1,3 @@
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferStrategy;
-import java.util.Scanner;
-
-import display.Display;
-import map.*;
-
-
 public class Main {
 
 	public static void main(String[] args){

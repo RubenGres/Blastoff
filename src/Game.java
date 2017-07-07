@@ -1,9 +1,13 @@
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import display.Display;
 import map.Map;
-import terrain.Cell;
 
 public class Game implements Runnable {
 
@@ -17,23 +21,29 @@ public class Game implements Runnable {
 	private BufferStrategy bs;
 	private Graphics g;
 	private Map map;
+	private BufferedImage bg_image = null;
 	
 	public Game(String title, int width, int height){
 		this.width = width;
 		this.height = height;
 		this.title = title;
+		
+		try {
+			this.bg_image = ImageIO.read(new File("res/textures/background/sky_bg.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void init(){
 		display = new Display(title, width, height);
-		long start = System.currentTimeMillis();
-		map = new Map(width / Cell.CELLHEIGHT, height / Cell.CELLWIDTH);
-		long stop = System.currentTimeMillis();
-		System.out.println("Map generation took " + (int) (stop-start) + " ms");
+		map = new Map(100, 100);
 	}
 	
 	private void tick(){
-		
+		this.width = display.getFrame().getWidth();
+		this.height = display.getFrame().getHeight();
 	}
 	
 	private void render(){
@@ -46,6 +56,8 @@ public class Game implements Runnable {
 		//Clear Screen
 		g.clearRect(0, 0, width, height);
 		//Draw Here!
+		
+		g.drawImage(bg_image, 0, 0, width, height, null);
 		
 		map.render(g);
 		
