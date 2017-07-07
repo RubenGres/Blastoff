@@ -26,7 +26,10 @@ public class Game implements Runnable {
 	
 	private void init(){
 		display = new Display(title, width, height);
+		long start = System.currentTimeMillis();
 		map = new Map(width / Cell.CELLHEIGHT, height / Cell.CELLWIDTH);
+		long stop = System.currentTimeMillis();
+		System.out.println("Map generation took " + (int) (stop-start) + " ms");
 	}
 	
 	private void tick(){

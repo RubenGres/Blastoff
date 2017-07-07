@@ -152,7 +152,7 @@ public class Cavegen {
 			}
 
 			public void paint(Graphics g) {
-				long start = System.currentTimeMillis();
+				//long start = System.currentTimeMillis();
 				int xOffset = 0, yOffset = 0;
 				for (int i = 0; i < y; i++) {
 					for (int j = 0; j < x; j++) {
@@ -167,7 +167,7 @@ public class Cavegen {
 					xOffset = 0;
 					yOffset += cellSize;
 				}
-				long stop = System.currentTimeMillis();
+				//long stop = System.currentTimeMillis();
 				// System.out.println("Binary display took " + (int)
 				// (stop-start) + "ms");
 			}
