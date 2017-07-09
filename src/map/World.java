@@ -2,20 +2,24 @@ package map;
 
 import java.awt.Graphics;
 import org.j3d.texture.procedural.PerlinNoiseGenerator;
+import main.Handler;
 import terrain.Cell;
 
-public class Map {
+public class World {
 
 	public int height, width;
 	public int[][] map;
 	private int surfaceHeight = 15;
+	private Handler handler;
 
 	private int highestPoint;
 
-	public Map(int width, int height) {
+	public World(int width, int height, Handler handler) {
 		this.height = height;
 		this.width = width;
+		this.handler = handler;
 		Cavegen cv = this.initCv();
+		cv.show(2);
 		this.generateMap(cv);
 	}
 
@@ -69,7 +73,7 @@ public class Map {
 	}
 
 	private void addSurfaceLayer(Cell cell) {
-		int amplitude = 15;
+		int amplitude = 10;
 		int zoom = 10;
 		PerlinNoiseGenerator pnl = new PerlinNoiseGenerator(91745718);
 
@@ -171,11 +175,30 @@ public class Map {
 		return y;
 	}
 
-	public void render(Graphics g) {		
-		for (int y = 0; y < this.height; y++) {
-			for (int x = 0; x < this.width; x++) {
-				Cell.getCellById(this.map[x][y]).render(g, x * Cell.CELLWIDTH, y * Cell.CELLHEIGHT);
+	public Cell getCell(int x, int y){
+		return Cell.getCellById(this.map[x][y]);
+	}
+	
+	public void render(Graphics g) {
+		int xStart = (int) Math.max(0, handler.getGame().getGameCamera().getxOffset() / Cell.CELLWIDTH);
+		int xEnd = (int) Math.min(width, (handler.getGame().getGameCamera().getxOffset()+handler.getGame().getWidth()) / Cell.CELLWIDTH + 1);
+		int yStart = (int) Math.max(0, handler.getGame().getGameCamera().getyOffset() / Cell.CELLHEIGHT);
+		int yEnd = (int) Math.min(width, (handler.getGame().getGameCamera().getyOffset()+handler.getGame().getHeight()) / Cell.CELLHEIGHT + 1);
+
+	//	int xStart = 0; int xEnd = width; int yStart = 0; int yEnd = height;
+		
+		for (int y = yStart; y < yEnd; y++) {
+			for (int x = xStart; x < xEnd; x++) {
+				Cell.getCellById(this.map[x][y]).render(g, (int) (x * Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset()), (int) (y * Cell.CELLHEIGHT - handler.getGame().getGameCamera().getyOffset()));
 			}
 		}
+	}
+
+	public int getWidth() {
+		return this.width;
+	}
+	
+	public int getHeight() {
+		return this.height;
 	}
 }
