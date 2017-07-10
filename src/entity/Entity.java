@@ -2,22 +2,23 @@ package entity;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
-
+import physics.Point;
+import terrain.Cell;
 import main.Handler;
 
 public abstract class Entity {
 
 	protected Handler handler;
-	protected float x, y;
+	
+	protected Point position;
+	
 	protected int width, height;
 	protected Rectangle bounds;
 	protected boolean hitbox;
-	protected final float g = 5f;
 
 	public Entity(Handler handler, float x, float y, int width, int height, boolean hitbox) {
 		this.handler = handler;
-		this.x = x;
-		this.y = y;
+		position = new Point(x,y);
 		this.width = width;
 		this.height = height;
 		this.hitbox = hitbox;
@@ -33,12 +34,8 @@ public abstract class Entity {
 
 	public abstract void render(Graphics g);
 
-	public float getX() {
-		return x;
-	}
-
-	public float getY() {
-		return y;
+	public Point getPosition() {
+		return position;
 	}
 
 	public int getHeight() {

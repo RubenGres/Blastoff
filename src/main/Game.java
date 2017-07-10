@@ -64,7 +64,7 @@ public class Game implements Runnable {
 		gameCamera = new GameCamera(handler);
 		map = new World(worldWidth, worldHeight, handler);
 		
-		player = new Player(handler, 0, 0, 30, 50);
+		player = new Player(handler, 0, 0, 30, 50, 7);
 	}
 	
 	public int getWidth() {

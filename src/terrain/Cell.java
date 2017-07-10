@@ -26,17 +26,12 @@ public abstract class Cell {
 	//ore
 	public static Cell goldCell = new GoldCell(30);
 	
-	public static final int CELLWIDTH = 20, CELLHEIGHT = 20;
+	public static final int CELLWIDTH = 32, CELLHEIGHT = 32;
 	
 	//CLASS
 	protected Color color;
 	protected final int id;
 	
-	/***
-	 * Constructor
-	 * @param color
-	 * @param id
-	 */
 	public Cell(Color color, int id){
 		this.color = color;
 		this.id = id;

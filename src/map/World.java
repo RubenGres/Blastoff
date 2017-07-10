@@ -9,7 +9,7 @@ public class World {
 
 	public int height, width;
 	public int[][] map;
-	private int surfaceHeight = 15;
+	private int surfaceHeight = 0;
 	private Handler handler;
 
 	private int highestPoint;
@@ -19,7 +19,6 @@ public class World {
 		this.width = width;
 		this.handler = handler;
 		Cavegen cv = this.initCv();
-		cv.show(2);
 		this.generateMap(cv);
 	}
 
@@ -176,6 +175,8 @@ public class World {
 	}
 
 	public Cell getCell(int x, int y){
+		if(y < 0)
+			return Cell.emptyCell;
 		return Cell.getCellById(this.map[x][y]);
 	}
 	
@@ -183,9 +184,7 @@ public class World {
 		int xStart = (int) Math.max(0, handler.getGame().getGameCamera().getxOffset() / Cell.CELLWIDTH);
 		int xEnd = (int) Math.min(width, (handler.getGame().getGameCamera().getxOffset()+handler.getGame().getWidth()) / Cell.CELLWIDTH + 1);
 		int yStart = (int) Math.max(0, handler.getGame().getGameCamera().getyOffset() / Cell.CELLHEIGHT);
-		int yEnd = (int) Math.min(width, (handler.getGame().getGameCamera().getyOffset()+handler.getGame().getHeight()) / Cell.CELLHEIGHT + 1);
-
-	//	int xStart = 0; int xEnd = width; int yStart = 0; int yEnd = height;
+		int yEnd = (int) Math.min(height, (handler.getGame().getGameCamera().getyOffset()+handler.getGame().getHeight()) / Cell.CELLHEIGHT + 1);
 		
 		for (int y = yStart; y < yEnd; y++) {
 			for (int x = xStart; x < xEnd; x++) {

@@ -2,72 +2,65 @@ package entity.creature;
 
 import entity.Entity;
 import main.Handler;
+import physics.Point;
+import physics.Vector;
 import terrain.Cell;
 
-public abstract class Creature extends Entity{
-	
+public abstract class Creature extends Entity {
+
 	protected float speed;
-	
 	public static final float DEFAULT_SPEED = 5f;
 	public static final int DEFAUL_CREATURE_WIDTH = 64, DEFAULT_CREATURE_HEIGHT = 64;
-	
-	protected float xMove, yMove;
-	
-	public Creature(Handler handler, float x, float y, int width, int height) {
+
+	protected Vector movement;
+
+	public Creature(Handler handler, float x, float y, int width, int height, float speed) {
 		super(handler, x, y, width, height, true);
-		speed = DEFAULT_SPEED;
-		xMove = 0;
-		yMove = 0;
+		this.speed = speed;
+		movement = new Vector(0, 0);
 	}
 
-	public void move(){
-		moveX();
-		moveY();
+	public void resetMovement(){
+		movement = new Vector(0, 0);
 	}
 	
-	private void moveX() {
-		if (xMove > 0) {// Moving right
-			int tx = (int) (x + xMove + bounds.x + bounds.width) / Cell.CELLWIDTH;
-			if(tx < handler.getWorld().width)
-			if (!collisionWithCell(tx, (int) (y + bounds.y) / Cell.CELLHEIGHT)
-					&& !collisionWithCell(tx, (int) (y + bounds.y + bounds.height) / Cell.CELLHEIGHT)) {
-				x += xMove;
-			} else {
-				x = tx * Cell.CELLWIDTH - bounds.x - bounds.width - 1;
-			}
+	public void move(Vector mov) {
+		Point pos = position.translate(mov);
+		position = avoidCollision(pos, mov);
+	}
+	
+	public Point avoidCollision(Point pos, Vector mov){
+		if (mov.getX() > 0) {
 
-		} else if (xMove < 0) {// Moving left
-			int tx = (int) (x + xMove + bounds.x) / Cell.CELLWIDTH;
-			if(tx > 0)
-			if (!collisionWithCell(tx, (int) (y + bounds.y) / Cell.CELLHEIGHT)
-					&& !collisionWithCell(tx, (int) (y + bounds.y + bounds.height) / Cell.CELLHEIGHT)) {
-				x += xMove;
-			} else {
-				x = tx * Cell.CELLWIDTH + Cell.CELLWIDTH - bounds.x;
+			int tx = (int) (position.getX() + mov.getX() + bounds.x + bounds.width) / Cell.CELLWIDTH;
+			if (collisionWithCell(tx, (int) (position.getY() + bounds.y) / Cell.CELLHEIGHT)
+					|| collisionWithCell(tx, (int) (position.getY() + bounds.y + bounds.height) / Cell.CELLHEIGHT)) {
+				pos.setX(tx * Cell.CELLWIDTH - bounds.x - bounds.width - 1);
+			}
+			
+		}else if(mov.getX() < 0){
+			int tx = (int) (position.getX() + mov.getX() + bounds.x) / Cell.CELLWIDTH;
+			if(collisionWithCell(tx, (int) (position.getY() + bounds.y) / Cell.CELLHEIGHT)
+					|| collisionWithCell(tx, (int) (position.getY() + bounds.y + bounds.height) / Cell.CELLHEIGHT )){
+				pos.setX(tx * Cell.CELLWIDTH + Cell.CELLWIDTH - bounds.x);
 			}
 		}
-	}
-
-	private void moveY() {
-		if (yMove < 0) {// Up
-			int ty = (int) (y + yMove + bounds.y) / Cell.CELLHEIGHT;
-			if(ty > 0)
-			if (!collisionWithCell((int) (x + bounds.x) / Cell.CELLWIDTH, ty)
-					&& !collisionWithCell((int) (x + bounds.x + bounds.width) / Cell.CELLWIDTH, ty)) {
-				y += yMove;
-			} else {
-				y = ty * Cell.CELLHEIGHT + Cell.CELLHEIGHT - bounds.y;
-			}
-		} else if (yMove > 0) {// Down
-			int ty = (int) (y + yMove + bounds.y + bounds.height) / Cell.CELLHEIGHT;
-			if(ty < handler.getWorld().height)
-			if (!collisionWithCell((int) (x + bounds.x) / Cell.CELLWIDTH, ty)
-					&& !collisionWithCell((int) (x + bounds.x + bounds.width) / Cell.CELLWIDTH, ty)) {
-				y += yMove;
-			} else {
-				y = ty * Cell.CELLHEIGHT - bounds.y - bounds.height - 1;
-			}
+		
+		if(mov.getY() < 0){
+			int ty = (int) (position.getY() + mov.getY() + bounds.y) / Cell.CELLHEIGHT;
+			if(collisionWithCell((int) (position.getX() + bounds.x) / Cell.CELLWIDTH, ty)
+				|| collisionWithCell((int) (position.getX() + bounds.x + bounds.width) / Cell.CELLWIDTH, ty)){
+					pos.setY(ty * Cell.CELLHEIGHT + Cell.CELLHEIGHT - bounds.y);
+				}
 		}
+		
+		if(mov.getY() > 0){
+			int ty = (int) (position.getY() + mov.getY() + bounds.height + bounds.y) / Cell.CELLHEIGHT;
+			if(collisionWithCell((int) (position.getX() + bounds.x) / Cell.CELLWIDTH, ty)
+				|| collisionWithCell((int) (position.getX() + bounds.x + bounds.width) / Cell.CELLWIDTH, ty)){
+					pos.setY(ty * Cell.CELLHEIGHT - bounds.y - bounds.height - 1);
+				}
+		}
+		return pos;
 	}
-
 }

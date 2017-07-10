@@ -8,5 +8,4 @@ public class GrassCell extends Cell {
 		super(Color.GREEN.darker(), id);
 		// TODO Auto-generated constructor stub
 	}
-
 }
