@@ -8,7 +8,7 @@ import terrain.Cell;
 public class World {
 
 	public int height, width;
-	public int[][] map;
+	private int[][] map;
 	private int surfaceHeight = 0;
 	private Handler handler;
 
@@ -19,9 +19,43 @@ public class World {
 		this.width = width;
 		this.handler = handler;
 		Cavegen cv = this.initCv();
+		cv.show(5);
 		this.generateMap(cv);
 	}
+	
+	public void breakCell(int x, int y){
+		map[x][y] = 0;
+	}
+	
+	public void render(Graphics g) {
+		int xStart = (int) Math.max(0, handler.getGame().getGameCamera().getxOffset() / Cell.CELLWIDTH);
+		int xEnd = (int) Math.min(width, (handler.getGame().getGameCamera().getxOffset()+handler.getGame().getWidth()) / Cell.CELLWIDTH + 1);
+		int yStart = (int) Math.max(0, handler.getGame().getGameCamera().getyOffset() / Cell.CELLHEIGHT);
+		int yEnd = (int) Math.min(height, (handler.getGame().getGameCamera().getyOffset()+handler.getGame().getHeight()) / Cell.CELLHEIGHT + 1);
+		
+		for (int y = yStart; y < yEnd; y++) {
+			for (int x = xStart; x < xEnd; x++) {
+				Cell.getCellById(this.map[x][y]).render(g, (int) (x * Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset()), (int) (y * Cell.CELLHEIGHT - handler.getGame().getGameCamera().getyOffset()));
+			}
+		}
+	}
+	
+	public Cell getCell(int x, int y){
+		if(y < 0)
+			return Cell.emptyCell;
+		return Cell.getCellById(this.map[x][y]);
+	}
 
+	public int getWidth() {
+		return this.width;
+	}
+	
+	public int getHeight() {
+		return this.height;
+	}
+	
+	//GENERATION
+	
 	private Cavegen initCv() {
 		float percentFilled = 0.47f; // Percentage of filled cell
 		int birth = 3; // Lives if more than x neighbors
@@ -74,7 +108,7 @@ public class World {
 	private void addSurfaceLayer(Cell cell) {
 		int amplitude = 10;
 		int zoom = 10;
-		PerlinNoiseGenerator pnl = new PerlinNoiseGenerator(91745718);
+		PerlinNoiseGenerator pnl = new PerlinNoiseGenerator(991283);
 
 		for (int x = 0; x < width; x++) {
 			float noise = pnl.noise1(((float) x) / zoom);
@@ -174,30 +208,4 @@ public class World {
 		return y;
 	}
 
-	public Cell getCell(int x, int y){
-		if(y < 0)
-			return Cell.emptyCell;
-		return Cell.getCellById(this.map[x][y]);
-	}
-	
-	public void render(Graphics g) {
-		int xStart = (int) Math.max(0, handler.getGame().getGameCamera().getxOffset() / Cell.CELLWIDTH);
-		int xEnd = (int) Math.min(width, (handler.getGame().getGameCamera().getxOffset()+handler.getGame().getWidth()) / Cell.CELLWIDTH + 1);
-		int yStart = (int) Math.max(0, handler.getGame().getGameCamera().getyOffset() / Cell.CELLHEIGHT);
-		int yEnd = (int) Math.min(height, (handler.getGame().getGameCamera().getyOffset()+handler.getGame().getHeight()) / Cell.CELLHEIGHT + 1);
-		
-		for (int y = yStart; y < yEnd; y++) {
-			for (int x = xStart; x < xEnd; x++) {
-				Cell.getCellById(this.map[x][y]).render(g, (int) (x * Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset()), (int) (y * Cell.CELLHEIGHT - handler.getGame().getGameCamera().getyOffset()));
-			}
-		}
-	}
-
-	public int getWidth() {
-		return this.width;
-	}
-	
-	public int getHeight() {
-		return this.height;
-	}
 }

@@ -12,6 +12,10 @@ public class Point {
 	public Point translate(Vector v){
 		return new Point(x + v.getX(), y + v.getY());
 	}
+	
+	public double distanceTo(Point other){
+		return Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2));
+	}
 
 	public float getX() {
 		return x;

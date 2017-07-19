@@ -1,4 +1,4 @@
-package input;
+package gfx;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;

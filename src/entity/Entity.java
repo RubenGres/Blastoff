@@ -3,7 +3,6 @@ package entity;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import physics.Point;
-import terrain.Cell;
 import main.Handler;
 
 public abstract class Entity {

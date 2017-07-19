@@ -104,6 +104,7 @@ public class Cavegen {
 
 	public void show(int pixelSize) {
 		DisplayCaves disp = new DisplayCaves(this, pixelSize);
+		disp.getAlignmentY();
 	}
 
 	@Override
@@ -123,6 +124,10 @@ public class Cavegen {
 
 	private class DisplayCaves extends JFrame {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		int x, y;
 
 		public DisplayCaves(Cavegen tg, int cellSize) {

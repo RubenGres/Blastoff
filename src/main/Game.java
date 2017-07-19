@@ -11,6 +11,7 @@ import display.Display;
 import entity.creature.Player;
 import gfx.GameCamera;
 import input.KeyManager;
+import input.MouseManager;
 import map.World;
 
 public class Game implements Runnable {
@@ -40,13 +41,15 @@ public class Game implements Runnable {
 	//handler
 	private Handler handler;
 	private KeyManager keyManager;
-	
+	private MouseManager mouseManager;
+
 	//Camera
 	private GameCamera gameCamera;
 	
 	public Game(String title, int width, int height){
 		this.title = title;
 		keyManager = new KeyManager();
+		mouseManager = new MouseManager();
 		
 		try {
 			this.bg_image = ImageIO.read(new File("res/textures/background/sky_bg.png"));
@@ -59,12 +62,17 @@ public class Game implements Runnable {
 	private void init(){
 		display = new Display(title, width, height);
 		display.getFrame().addKeyListener(keyManager);
+
+		display.getFrame().addMouseListener(mouseManager);
+		display.getFrame().addMouseMotionListener(mouseManager);
+		display.getCanvas().addMouseListener(mouseManager);
+		display.getCanvas().addMouseMotionListener(mouseManager);
 		
 		handler = new Handler(this);
 		gameCamera = new GameCamera(handler);
 		map = new World(worldWidth, worldHeight, handler);
 		
-		player = new Player(handler, 0, 0, 30, 50, 7);
+		player = new Player(handler, 0, 0, 30, 50, 4);
 	}
 	
 	public int getWidth() {
@@ -170,4 +178,8 @@ public class Game implements Runnable {
 		return gameCamera;
 	}
 
+	public MouseManager getMouseManager() {
+		return mouseManager;
+	}
+	
 }
