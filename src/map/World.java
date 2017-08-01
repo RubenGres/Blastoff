@@ -19,7 +19,6 @@ public class World {
 		this.width = width;
 		this.handler = handler;
 		Cavegen cv = this.initCv();
-		cv.show(5);
 		this.generateMap(cv);
 	}
 	

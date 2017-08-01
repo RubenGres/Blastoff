@@ -8,6 +8,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import display.Display;
+import entity.EntityManager;
+import entity.FuelTank;
 import entity.creature.Player;
 import gfx.GameCamera;
 import input.KeyManager;
@@ -20,8 +22,8 @@ public class Game implements Runnable {
 	public int width = 1000, height = 700;
 	public String title;
 	
-	//player
-	Player player;
+	//entity manager
+	EntityManager em;
 	
 	//game thread
 	private boolean running = false;
@@ -72,7 +74,9 @@ public class Game implements Runnable {
 		gameCamera = new GameCamera(handler);
 		map = new World(worldWidth, worldHeight, handler);
 		
-		player = new Player(handler, 0, 0, 30, 50, 4);
+		Player player = new Player(handler, 0, 0, 30, 50, 4);
+		this.em = new EntityManager(handler, player);
+		em.addEntity(new FuelTank(handler, 300, 150));
 	}
 	
 	public int getWidth() {
@@ -91,8 +95,8 @@ public class Game implements Runnable {
 		this.width = display.getFrame().getWidth();
 		this.height = display.getFrame().getHeight();
 		keyManager.tick();
-		player.tick();
-		handler = new Handler(this);
+		em.tick();
+		//handler = new Handler(this);
 	}
 	
 	private void render(){
@@ -109,7 +113,7 @@ public class Game implements Runnable {
 		g.drawImage(bg_image, 0, 0, width, height, null);
 		
 		map.render(g);
-		player.render(g);
+		em.render(g);
 		
 		//End Drawing!
 		bs.show();
@@ -180,6 +184,10 @@ public class Game implements Runnable {
 
 	public MouseManager getMouseManager() {
 		return mouseManager;
+	}
+
+	public EntityManager getEntityManager() {
+		return em;
 	}
 	
 }

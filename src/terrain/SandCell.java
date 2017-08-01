@@ -8,18 +8,15 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import gfx.Assets;
+
 public class SandCell extends Cell {
 	
 	BufferedImage sand;
 
 	public SandCell(int id) {
 		super(new Color(232, 172, 39), id);
-		try {
-			this.sand = ImageIO.read(new File("res/tiles/sand.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.sand = Assets.sand;
 	}
 	
 	@Override

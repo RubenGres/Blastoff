@@ -1,5 +1,6 @@
 package entity;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import physics.Point;
@@ -33,6 +34,12 @@ public abstract class Entity {
 
 	public abstract void render(Graphics g);
 
+	protected void renderHitbox(Graphics g){
+		g.setColor(Color.RED);
+		g.drawRect((int) (position.getX() - handler.getGame().getGameCamera().getxOffset()),
+					(int) (position.getY() - handler.getGame().getGameCamera().getyOffset()), bounds.width, bounds.height);
+	}
+	
 	public Point getPosition() {
 		return position;
 	}

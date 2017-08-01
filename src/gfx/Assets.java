@@ -8,7 +8,14 @@ import javax.imageio.ImageIO;
 
 public class Assets {
 
-	public static BufferedImage grass = loadTexture("res/tiles/grass.png"), sand, gravel, cobble, stone;
+	public static BufferedImage grass = loadTexture("res/tiles/grass.png"), 
+			sand = loadTexture("res/tiles/sand.png"), 
+			gravel, 
+			cobble, 
+			stone;
+	
+	public static  BufferedImage player = loadTexture("res/textures/player.png"),
+			fueltank =  loadTexture("res/textures/fueltank.png");
 	
 	public static BufferedImage loadTexture(String path){
 		try {

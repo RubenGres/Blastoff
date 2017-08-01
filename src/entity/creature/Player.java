@@ -1,5 +1,6 @@
 package entity.creature;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -7,6 +8,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import gfx.Assets;
 import gfx.ImageManipulator;
 import input.MouseManager;
 import main.Handler;
@@ -16,7 +18,11 @@ import terrain.Cell;
 
 public class Player extends Creature {
 
-	private float jetpackSpeed = Vector.g.getY();
+	//jetpack
+	private float jetpackSpeed = 8.3f;
+	private float jetpackMaxFuel = 100;
+	private float jetpackFuel = jetpackMaxFuel;
+	
 	private BufferedImage playerSprite;
 	
 	private boolean facingLeft;
@@ -27,12 +33,7 @@ public class Player extends Creature {
 		bounds.y = 0;
 		bounds.width = width;
 		bounds.height = height;
-		try {
-			this.playerSprite = ImageIO.read(new File("res/textures/player.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.playerSprite = Assets.player;
 	}
 
 	@Override
@@ -51,8 +52,14 @@ public class Player extends Creature {
 
 		resetMovement();
 
-		if (handler.getGame().getKeyManager().jetpack)
-			movement = movement.add(new Vector(0, -jetpackSpeed));
+		if (handler.getGame().getKeyManager().jetpack){
+			if(jetpackFuel > 0){
+				movement = movement.add(new Vector(0, -jetpackSpeed));
+				jetpackFuel -= 0.2;
+				if(jetpackFuel < 0)
+					jetpackFuel = 0;
+			}
+		}
 
 		if (handler.getGame().getKeyManager().right)
 			movement = movement.add(new Vector(speed, 0));
@@ -60,25 +67,44 @@ public class Player extends Creature {
 		if (handler.getGame().getKeyManager().left)
 			movement = movement.add(new Vector(-speed, 0));
 
-		if (handler.getGame().getKeyManager().up)
-			movement = movement.add(new Vector(0, -speed));
-
-		if (handler.getGame().getKeyManager().down)
-			movement = movement.add(new Vector(0, speed));
-
 		if (mm.isLeftPressed()) {
 			float xOffset = handler.getGame().getGameCamera().getxOffset();
 			float yOffset = handler.getGame().getGameCamera().getyOffset();
 			int x = (int) (mm.getMouseX() + xOffset);
 			int y = (int) (mm.getMouseY() + yOffset);
 
-			if (position.distanceTo(new Point(x, y)) < 100)
+			if (new Point(position.getX() + width/2, position.getY() + height/2).distanceTo(new Point(x, y)) < 100)
 				handler.getWorld().breakCell(x / Cell.CELLWIDTH, y / Cell.CELLHEIGHT);
 		}
 	}
 
 	@Override
 	public void render(Graphics g) {
+		renderFuel(g);
+		renderPlayer(g);
+		renderHitbox(g);
+	}
+	
+	public void addFuel(float amount){
+		jetpackFuel += amount;
+		if(jetpackFuel > jetpackMaxFuel)
+			jetpackFuel = jetpackMaxFuel;
+	}
+	
+	private void renderFuel(Graphics g){
+		g.setColor(Color.BLACK);
+		int x = 32;
+		
+		g.drawString("Fuel: ", 1, 15);
+		
+		g.setColor(Color.YELLOW);
+		g.fillRect(x, 5, (int) ((jetpackFuel/jetpackMaxFuel)*500), 10);
+		
+		g.setColor(Color.BLACK);
+		g.drawRect(x, 5, 500, 10);
+	}
+	
+	private void renderPlayer(Graphics g){
 		if(movement.getX() != 0)
 			facingLeft = movement.getX() < 0;
 		
@@ -89,6 +115,5 @@ public class Player extends Creature {
 			g.drawImage(playerSprite, (int) (position.getX() - handler.getGame().getGameCamera().getxOffset()),
 					(int) (position.getY() - handler.getGame().getGameCamera().getyOffset()), width, height, null);			
 		}
-
 	}
 }
