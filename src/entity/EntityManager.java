@@ -4,15 +4,20 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 
 import entity.creature.Player;
 import main.Handler;
+import physics.Vector;
+import terrain.Cell;
 
 public class EntityManager {
 	
 	private Handler handler;
 	private Player player;
+	
 	private ArrayList<Entity> entities;
+	private ArrayList<Entity> toRemove = new ArrayList<>();
 	
 	private Comparator<Entity> renderSorter = new Comparator<Entity>(){
 		@Override
@@ -37,17 +42,17 @@ public class EntityManager {
 	}
 	
 	public void tick(){
-		for(int i = 0;i < entities.size();i++){
-			Entity e = entities.get(i);
-			e.tick();
+
+		for(Entity e : entities){
+			if(!(e instanceof Player))
+				e.position = e.avoidCollision(e.position, Vector.g);
+		    e.tick();
 		}
+		
+		entities.removeAll(toRemove);
+		toRemove = new ArrayList<>();
+		
 		entities.sort(renderSorter);
-		checkEntityCollision();
-	}
-	
-	private void checkEntityCollision() {
-		for(int i = 1; i < entities.size(); i++){
-		}		
 	}
 
 	public void render(Graphics g){
@@ -61,7 +66,7 @@ public class EntityManager {
 	}
 	
 	public void removeEntity(Entity e) {
-		entities.remove(e);
+		toRemove.add(e);
 		e = null;
 	}
 	

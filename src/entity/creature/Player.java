@@ -22,13 +22,14 @@ public class Player extends Creature {
 	private float jetpackSpeed = 8.3f;
 	private float jetpackMaxFuel = 100;
 	private float jetpackFuel = jetpackMaxFuel;
+	private float jetpackCostPerTick = 0.2f;
 	
 	private BufferedImage playerSprite;
 	
 	private boolean facingLeft;
 
-	public Player(Handler handler, float x, float y, int width, int height, float speed) {
-		super(handler, x, y, width, height, speed);
+	public Player(Handler handler, float x, float y) {
+		super(handler, x, y, 30, 50, 4);
 		bounds.x = 0;
 		bounds.y = 0;
 		bounds.width = width;
@@ -55,7 +56,7 @@ public class Player extends Creature {
 		if (handler.getGame().getKeyManager().jetpack){
 			if(jetpackFuel > 0){
 				movement = movement.add(new Vector(0, -jetpackSpeed));
-				jetpackFuel -= 0.2;
+				jetpackFuel -= jetpackCostPerTick;
 				if(jetpackFuel < 0)
 					jetpackFuel = 0;
 			}

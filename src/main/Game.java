@@ -74,9 +74,9 @@ public class Game implements Runnable {
 		gameCamera = new GameCamera(handler);
 		map = new World(worldWidth, worldHeight, handler);
 		
-		Player player = new Player(handler, 0, 0, 30, 50, 4);
+		Player player = new Player(handler, 0, 0);
 		this.em = new EntityManager(handler, player);
-		em.addEntity(new FuelTank(handler, 300, 150));
+   		em.addEntity(new FuelTank(handler, 220, 10));
 	}
 	
 	public int getWidth() {
@@ -96,7 +96,6 @@ public class Game implements Runnable {
 		this.height = display.getFrame().getHeight();
 		keyManager.tick();
 		em.tick();
-		//handler = new Handler(this);
 	}
 	
 	private void render(){

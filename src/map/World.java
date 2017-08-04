@@ -40,9 +40,11 @@ public class World {
 	}
 	
 	public Cell getCell(int x, int y){
-		if(y < 0)
+		try {
+			return Cell.getCellById(this.map[x][y]);
+		} catch (Exception e) {
 			return Cell.emptyCell;
-		return Cell.getCellById(this.map[x][y]);
+		}
 	}
 
 	public int getWidth() {
@@ -105,8 +107,8 @@ public class World {
 	}
 
 	private void addSurfaceLayer(Cell cell) {
-		int amplitude = 10;
-		int zoom = 10;
+		int amplitude = 15;
+		int zoom = 9;
 		PerlinNoiseGenerator pnl = new PerlinNoiseGenerator(991283);
 
 		for (int x = 0; x < width; x++) {
