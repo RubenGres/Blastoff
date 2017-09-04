@@ -1,14 +1,18 @@
 package map;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.j3d.texture.procedural.PerlinNoiseGenerator;
 import main.Handler;
 import terrain.Cell;
+import terrain.liquid.LiquidCell;
 
 public class World {
 
 	public int height, width;
-	private int[][] map;
+	private Cell[][] map;
 	private int surfaceHeight = 0;
 	private Handler handler;
 
@@ -21,27 +25,82 @@ public class World {
 		Cavegen cv = this.initCv();
 		this.generateMap(cv);
 	}
-	
-	public void breakCell(int x, int y){
-		map[x][y] = 0;
+
+	public void setCell(int x, int y, Cell cell) {
+		map[x][y] = cell;
 	}
-	
+
+	public void tick() {
+		flowLiquids();
+	}
+
+	public void flowLiquids(){
+		for (int x = 0; x < width; x++)
+			for (int y = 0; y < height; y++)
+				if (this.getCell(x, y) instanceof LiquidCell){
+					LiquidCell tmp = (LiquidCell) getCell(x, y);
+						flowCell(x, y, tmp);
+				}
+	}
+
+	private void flowCell(int x, int y, LiquidCell currentCell) {
+
+		Cell downCell = this.getCell(x, y + 1);
+		Cell leftCell = getCell(x - 1, y);
+		Cell rightCell = getCell(x + 1, y);
+
+		int flowX = 0;
+		int flowY = 0;
+
+		// flow down
+		if (downCell.equals(Cell.emptyCell)) {
+			flowY = 1;
+		} else { // flow left and right
+
+			if (leftCell.equals(Cell.emptyCell) && rightCell.equals(Cell.emptyCell)) { // random
+																						// if
+																						// both
+																						// possible
+				flowX = (int) (Math.random() * 2);
+				if (flowX == 0)
+					flowX = -1;
+
+			} else if (leftCell.equals(Cell.emptyCell)) {
+				flowX = -1;
+			} else if (rightCell.equals(Cell.emptyCell)) {
+				flowX = 1;
+			}
+
+		}
+
+		this.setCell(x, y, Cell.emptyCell);
+		this.setCell(x + flowX, y + flowY, currentCell);
+	}
+
+	public void breakCell(int x, int y) {
+		if (!(this.getCell(x, y) instanceof LiquidCell))
+			map[x][y] = Cell.emptyCell;
+	}
+
 	public void render(Graphics g) {
 		int xStart = (int) Math.max(0, handler.getGame().getGameCamera().getxOffset() / Cell.CELLWIDTH);
-		int xEnd = (int) Math.min(width, (handler.getGame().getGameCamera().getxOffset()+handler.getGame().getWidth()) / Cell.CELLWIDTH + 1);
+		int xEnd = (int) Math.min(width,
+				(handler.getGame().getGameCamera().getxOffset() + handler.getGame().getWidth()) / Cell.CELLWIDTH + 1);
 		int yStart = (int) Math.max(0, handler.getGame().getGameCamera().getyOffset() / Cell.CELLHEIGHT);
-		int yEnd = (int) Math.min(height, (handler.getGame().getGameCamera().getyOffset()+handler.getGame().getHeight()) / Cell.CELLHEIGHT + 1);
-		
+		int yEnd = (int) Math.min(height,
+				(handler.getGame().getGameCamera().getyOffset() + handler.getGame().getHeight()) / Cell.CELLHEIGHT + 1);
+
 		for (int y = yStart; y < yEnd; y++) {
 			for (int x = xStart; x < xEnd; x++) {
-				Cell.getCellById(this.map[x][y]).render(g, (int) (x * Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset()), (int) (y * Cell.CELLHEIGHT - handler.getGame().getGameCamera().getyOffset()));
+				this.map[x][y].render(g, (int) (x * Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset()),
+						(int) (y * Cell.CELLHEIGHT - handler.getGame().getGameCamera().getyOffset()));
 			}
 		}
 	}
-	
-	public Cell getCell(int x, int y){
+
+	public Cell getCell(int x, int y) {
 		try {
-			return Cell.getCellById(this.map[x][y]);
+			return this.map[x][y];
 		} catch (Exception e) {
 			return Cell.emptyCell;
 		}
@@ -50,13 +109,13 @@ public class World {
 	public int getWidth() {
 		return this.width;
 	}
-	
+
 	public int getHeight() {
 		return this.height;
 	}
-	
-	//GENERATION
-	
+
+	// GENERATION
+
 	private Cavegen initCv() {
 		float percentFilled = 0.47f; // Percentage of filled cell
 		int birth = 3; // Lives if more than x neighbors
@@ -67,14 +126,14 @@ public class World {
 
 	private void generateMap(Cavegen cv) {
 
-		this.map = new int[width][height];
+		this.map = new Cell[width][height];
 
 		for (int y = surfaceHeight; y < this.height; y++)
 			for (int x = 0; x < this.width; x++) {
 				if (cv.getCellmap()[x][y - surfaceHeight])
-					this.map[x][y] = Cell.bedrockCell.getId();
+					this.map[x][y] = Cell.bedrockCell;
 				else
-					this.map[x][y] = Cell.emptyCell.getId();
+					this.map[x][y] = Cell.emptyCell;
 			}
 
 		addSurfaceLayer(Cell.grassCell);
@@ -88,7 +147,7 @@ public class World {
 		addLayer(0, height - 60, Cell.dirtCell, 5);
 		addLayer(0, this.highestPoint + 15, Cell.sandCell, 10);
 
-		addLavaToBottom(height - 10);
+		addLavaToBottom(15);
 		addBedrock(); // just to be sure
 
 		cleanSurfaceLayer(Cell.grassCell);
@@ -114,7 +173,7 @@ public class World {
 		for (int x = 0; x < width; x++) {
 			float noise = pnl.noise1(((float) x) / zoom);
 			int y = (int) (((noise + 1) / 2) * amplitude);
-			this.map[x][y + this.surfaceHeight] = cell.getId();
+			this.map[x][y + this.surfaceHeight] = cell;
 		}
 	}
 
@@ -122,19 +181,19 @@ public class World {
 		for (int x = 0; x < width; x++) {
 
 			int y = 0;
-			// localize height of the surfaceLayer on x
+			// get height of the surfaceLayer on x
 			y = this.getFirstCellOccurence(x, surfaceCell);
 
-			// Empty top part
+			// Clear top cells
 			int a = 1;
 			while (y - a >= 0) {
-				map[x][y - a] = Cell.emptyCell.getId();
+				map[x][y - a] = Cell.emptyCell;
 				a++;
 			}
 
-			// Fill bottom part with sand
-			if (map[x][y + 1] == Cell.emptyCell.getId())
-				map[x][y + 1] = Cell.sandCell.getId();
+			// Fill bottom cell with sand
+			if (map[x][y + 1] == Cell.emptyCell)
+				map[x][y + 1] = Cell.sandCell;
 
 		}
 	}
@@ -142,13 +201,13 @@ public class World {
 	private void addLavaToBottom(int yStart) {
 		for (int y = yStart; y < height; y++)
 			for (int x = 0; x < width; x++)
-				if (this.map[x][y] == Cell.emptyCell.getId())
-					this.map[x][y] = Cell.lavaCell.getId();
+				if (this.map[x][y] == Cell.emptyCell)
+					this.map[x][y] = Cell.lavaCell;
 	}
 
 	private void addBedrock() {
 		for (int x = 0; x < this.width; x++)
-			this.map[x][height - 1] = Cell.bedrockCell.getId();
+			this.map[x][height - 1] = Cell.bedrockCell;
 	}
 
 	private void transition(int yStart, int yEnd, int x, Cell cell) {
@@ -159,9 +218,9 @@ public class World {
 		}
 
 		for (int y = yStart; y < yStart + size; y++)
-			if (this.map[x][y] != Cell.emptyCell.getId() & this.map[x][y] != Cell.grassCell.getId())
+			if (this.map[x][y] != Cell.emptyCell & this.map[x][y] != Cell.grassCell)
 				if (Math.random() < progressionPercentage[y - yStart])
-					this.map[x][y] = cell.getId();
+					this.map[x][y] = cell;
 	}
 
 	/**
@@ -188,8 +247,8 @@ public class World {
 
 			for (int y = y1 + yOffset; y < yMaxLoop; y++) {
 				if (y < height)
-					if (this.map[x][y] != Cell.emptyCell.getId() & this.map[x][y] != Cell.grassCell.getId())
-						this.map[x][y] = cell.getId();
+					if (this.map[x][y] != Cell.emptyCell & this.map[x][y] != Cell.grassCell)
+						this.map[x][y] = cell;
 			}
 
 			int yTransitionEnd = Math.min(height, y2 + yOffset);
@@ -201,7 +260,7 @@ public class World {
 
 	private int getFirstCellOccurence(int x, Cell cell) {
 		int y = 0;
-		while (map[x][y] != cell.getId()) {
+		while (map[x][y] != cell) {
 			y++;
 			if (y == height)
 				return 0;

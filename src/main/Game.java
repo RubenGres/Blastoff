@@ -94,6 +94,9 @@ public class Game implements Runnable {
 	private void tick(){
 		this.width = display.getFrame().getWidth();
 		this.height = display.getFrame().getHeight();
+		
+		this.map.tick();
+		
 		keyManager.tick();
 		em.tick();
 	}

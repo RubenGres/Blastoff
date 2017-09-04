@@ -20,7 +20,7 @@ public class Player extends Creature {
 
 	//jetpack
 	private float jetpackSpeed = 8.3f;
-	private float jetpackMaxFuel = 100;
+	private float jetpackMaxFuel = 400;
 	private float jetpackFuel = jetpackMaxFuel;
 	private float jetpackCostPerTick = 0.2f;
 	
