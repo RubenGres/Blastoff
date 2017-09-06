@@ -1,24 +1,35 @@
 package map;
 
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
 import org.j3d.texture.procedural.PerlinNoiseGenerator;
+
+import entity.EntityManager;
+import entity.FuelTank;
+import entity.creature.Player;
 import main.Handler;
 import terrain.Cell;
 import terrain.liquid.LiquidCell;
+import utils.Couple;
 
-public class World {
+public class GameWorld {
 
 	public int height, width;
 	private Cell[][] map;
 	private int surfaceHeight = 0;
 	private Handler handler;
-
 	private int highestPoint;
 
-	public World(int width, int height, Handler handler) {
+	//ArrayList<Couple<Integer>> l; ce n'était pas la solution finale que j'espérait :(
+	
+	public GameWorld(int width, int height, Handler handler) {
 		this.height = height;
 		this.width = width;
 		this.handler = handler;
@@ -27,7 +38,11 @@ public class World {
 	}
 
 	public void setCell(int x, int y, Cell cell) {
-		map[x][y] = cell;
+		try {
+			map[x][y] = cell;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void tick() {
@@ -44,7 +59,7 @@ public class World {
 	}
 
 	private void flowCell(int x, int y, LiquidCell currentCell) {
-
+		
 		Cell downCell = this.getCell(x, y + 1);
 		Cell leftCell = getCell(x - 1, y);
 		Cell rightCell = getCell(x + 1, y);
@@ -66,7 +81,8 @@ public class World {
 					flowX = -1;
 
 			} else if (leftCell.equals(Cell.emptyCell)) {
-				flowX = -1;
+					flowX = -1;
+				
 			} else if (rightCell.equals(Cell.emptyCell)) {
 				flowX = 1;
 			}

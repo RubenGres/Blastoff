@@ -1,4 +1,5 @@
 package main;
+
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -14,54 +15,43 @@ import entity.creature.Player;
 import gfx.GameCamera;
 import input.KeyManager;
 import input.MouseManager;
-import map.World;
+import map.GameWorld;
+import states.GameState;
+import states.MenuState;
+import states.State;
 
 public class Game implements Runnable {
 
 	private Display display;
 	public int width = 1000, height = 700;
 	public String title;
-	
-	//entity manager
-	EntityManager em;
-	
-	//game thread
+
+	// game thread
 	private boolean running = false;
 	private Thread thread;
-	private int FPS = 60;	
-	
-	//game world
-	private static int worldWidth = 300, worldHeight = 100;
-	
+	private int FPS = 60;
+
+	// rendering
 	private BufferStrategy bs;
 	private Graphics g;
-	private World map;
-	
-	//background
-	private BufferedImage bg_image = null;
-	
-	//handler
+
+	// handler
 	private Handler handler;
 	private KeyManager keyManager;
 	private MouseManager mouseManager;
 
-	//Camera
-	private GameCamera gameCamera;
-	
-	public Game(String title, int width, int height){
+	// States
+	private GameState gameState;
+	private MenuState menuState;
+
+	public Game(String title, int width, int height) {
 		this.title = title;
+
 		keyManager = new KeyManager();
-		mouseManager = new MouseManager();
-		
-		try {
-			this.bg_image = ImageIO.read(new File("res/textures/background/sky_bg.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		mouseManager = new MouseManager();		
 	}
-	
-	private void init(){
+
+	private void init() {
 		display = new Display(title, width, height);
 		display.getFrame().addKeyListener(keyManager);
 
@@ -69,16 +59,14 @@ public class Game implements Runnable {
 		display.getFrame().addMouseMotionListener(mouseManager);
 		display.getCanvas().addMouseListener(mouseManager);
 		display.getCanvas().addMouseMotionListener(mouseManager);
-		
+
 		handler = new Handler(this);
-		gameCamera = new GameCamera(handler);
-		map = new World(worldWidth, worldHeight, handler);
-		
-		Player player = new Player(handler, 0, 0);
-		this.em = new EntityManager(handler, player);
-   		em.addEntity(new FuelTank(handler, 220, 10));
+
+		this.gameState = new GameState(handler);
+		this.menuState = new MenuState(handler);
+		State.setState(menuState);
 	}
-	
+
 	public int getWidth() {
 		return width;
 	}
@@ -87,85 +75,83 @@ public class Game implements Runnable {
 		return height;
 	}
 
-	public World getMap() {
-		return map;
+	public GameWorld getMap() {
+		return gameState.getMap();
 	}
 
-	private void tick(){
+	private void tick() {
 		this.width = display.getFrame().getWidth();
 		this.height = display.getFrame().getHeight();
 		
-		this.map.tick();
-		
 		keyManager.tick();
-		em.tick();
+
+		if (State.getState() != null)
+			State.getState().tick();
 	}
-	
-	private void render(){
+
+	private void render() {
 		bs = display.getCanvas().getBufferStrategy();
-		if(bs == null){
+		if (bs == null) {
 			display.getCanvas().createBufferStrategy(3);
 			return;
 		}
 		g = bs.getDrawGraphics();
-		//Clear Screen
+		// Clear Screen
 		g.clearRect(0, 0, width, height);
-		//Draw Here!
-		
-		g.drawImage(bg_image, 0, 0, width, height, null);
-		
-		map.render(g);
-		em.render(g);
-		
-		//End Drawing!
+		// Draw Here!
+
+		if (State.getState() != null)
+			State.getState().render(g);
+
+		// End Drawing!
 		bs.show();
 		g.dispose();
 	}
-	
-	public void run(){
-		
+
+	public void run() {
+
 		init();
 		double timePerTick = 1000000000 / FPS;
-		double  delta = 0;
+		double delta = 0;
 		long now;
 		long lastTime = System.nanoTime();
 		long timer = 0;
 		int ticks = 0;
-		
-		while(running){
+
+		while (running) {
 			now = System.nanoTime();
 			delta += (now - lastTime) / timePerTick;
 			timer += now - lastTime;
 			lastTime = now;
-			
-			if(delta >= 1){
+
+			if (delta >= 1) {
 				tick();
 				render();
-				ticks ++;
-				delta --;
+				ticks++;
+				delta--;
 			}
-			
-			if(timer >= 1000000000){				
+
+			if (timer >= 1000000000) {
 				System.out.println("FPS : " + ticks);
 				ticks = 0;
 				timer = 0;
 			}
 		}
-		
+
 		stop();
-		
+
 	}
-	
-	public synchronized void start(){
-		if(running)
+
+	public synchronized void start() {
+		if (running)
 			return;
 		running = true;
 		thread = new Thread(this);
 		thread.start();
 	}
-	
-	public synchronized void stop(){
-		if(!running)
+
+	public synchronized void stop() {
+		if (!running)
 			return;
 		running = false;
 		try {
@@ -178,10 +164,9 @@ public class Game implements Runnable {
 	public KeyManager getKeyManager() {
 		return keyManager;
 	}
-	
-	
+
 	public GameCamera getGameCamera() {
-		return gameCamera;
+		return gameState.getGameCamera();
 	}
 
 	public MouseManager getMouseManager() {
@@ -189,7 +174,7 @@ public class Game implements Runnable {
 	}
 
 	public EntityManager getEntityManager() {
-		return em;
+		return gameState.getEntityManager();
 	}
-	
+
 }

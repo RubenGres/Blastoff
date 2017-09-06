@@ -1,17 +1,17 @@
 package main;
 
-import map.World;
+import map.GameWorld;
 
 public class Handler {
 
 	private Game game;
-	private World world;
+	private GameWorld world;
 
 	public Handler(Game game) {
 		this.game = game;
 	}
 
-	public void setWorld(World world) {
+	public void setWorld(GameWorld world) {
 		this.world = world;
 	}
 
@@ -19,7 +19,7 @@ public class Handler {
 		return game;
 	}
 
-	public World getWorld() {
+	public GameWorld getWorld() {
 		return game.getMap();
 	}
 }

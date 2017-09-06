@@ -49,7 +49,9 @@ public class Player extends Creature {
 	}
 
 	private void getInput() {
-		MouseManager mm = handler.getGame().getMouseManager();
+		MouseManager mm = handler
+				.getGame()
+				.getMouseManager();
 
 		resetMovement();
 
