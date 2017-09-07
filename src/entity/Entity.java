@@ -55,6 +55,7 @@ public abstract class Entity {
 		mov = mov.multiply(handler.getWorld()
 				.getCell((int) (position.getX() / Cell.CELLWIDTH), (int) (position.getY()) / Cell.CELLHEIGHT)
 				.getViscuosity());
+		
 		pos = pos.translate(mov);
 		if (mov.getX() > 0) {
 			int tx = (int) (position.getX() + mov.getX() + bounds.x + bounds.width) / Cell.CELLWIDTH;

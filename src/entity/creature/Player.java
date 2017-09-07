@@ -93,7 +93,7 @@ public class Player extends Creature {
 		renderFuel(g);
 		renderPlayer(g);
 		renderHealth(g);
-		//renderHitbox(g);
+
 	}
 	
 	public void addFuel(float amount){

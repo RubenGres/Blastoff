@@ -49,6 +49,6 @@ public abstract class Creature extends Entity {
 		if(health<0){
 			State.setState(handler.getGame().menuState);
 		}
+
 	}
-	
 }
