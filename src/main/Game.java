@@ -64,7 +64,7 @@ public class Game implements Runnable {
 
 		this.gameState = new GameState(handler);
 		this.menuState = new MenuState(handler);
-		State.setState(menuState);
+		State.setState(gameState);
 	}
 
 	public int getWidth() {
