@@ -41,8 +41,8 @@ public class Game implements Runnable {
 	private MouseManager mouseManager;
 
 	// States
-	private GameState gameState;
-	private MenuState menuState;
+	public GameState gameState;
+	public MenuState menuState;
 
 	public Game(String title, int width, int height) {
 		this.title = title;
@@ -64,7 +64,7 @@ public class Game implements Runnable {
 
 		this.gameState = new GameState(handler);
 		this.menuState = new MenuState(handler);
-		State.setState(gameState);
+		State.setState(menuState);
 	}
 
 	public int getWidth() {

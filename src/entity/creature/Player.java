@@ -29,9 +29,11 @@ public class Player extends Creature {
 	private boolean facingLeft;
 
 	public Player(Handler handler, float x, float y) {
-		super(handler, x, y, 30, 50, 4);
+		super(handler, x, y);
 		bounds.x = 0;
 		bounds.y = 0;
+		width = 30;
+		height = 50;
 		bounds.width = width;
 		bounds.height = height;
 		this.playerSprite = Assets.player;
@@ -85,7 +87,6 @@ public class Player extends Creature {
 	public void render(Graphics g) {
 		renderFuel(g);
 		renderPlayer(g);
-		renderHitbox(g);
 	}
 	
 	public void addFuel(float amount){

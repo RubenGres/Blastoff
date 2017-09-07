@@ -12,8 +12,8 @@ public abstract class Creature extends Entity {
 	public static final float DEFAULT_SPEED = 5f;
 	public static final int DEFAUL_CREATURE_WIDTH = 64, DEFAULT_CREATURE_HEIGHT = 64;
 
-	public Creature(Handler handler, float x, float y, int width, int height, float speed) {
-		super(handler, x, y, width, height, true);
-		this.speed = speed;
+	public Creature(Handler handler, float x, float y) {
+		super(handler, x, y, DEFAUL_CREATURE_WIDTH, DEFAULT_CREATURE_HEIGHT, true);
+		this.speed = DEFAULT_SPEED;
 	}
 }
