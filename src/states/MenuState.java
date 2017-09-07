@@ -18,11 +18,7 @@ public class MenuState extends State{
 		super(handler);
 		init();
 	}
-	
-	private void init(){
-		for(String str : menuItemNames)
-			handler.getGame().getHeight();
-	}
+
 
 	@Override
 	public void tick() {
