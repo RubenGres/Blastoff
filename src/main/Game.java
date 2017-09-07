@@ -96,6 +96,7 @@ public class Game implements Runnable {
 			return;
 		}
 		g = bs.getDrawGraphics();
+		
 		// Clear Screen
 		g.clearRect(0, 0, width, height);
 		// Draw Here!
