@@ -23,22 +23,29 @@ public class Player extends Creature {
 	private float jetpackMaxFuel = 400;
 	private float jetpackFuel = jetpackMaxFuel;
 	private float jetpackCostPerTick = 0.2f;
+	private float maxHealth = 100;
+
 	
 	private BufferedImage playerSprite;
 	
 	private boolean facingLeft;
 
 	public Player(Handler handler, float x, float y) {
-		super(handler, x, y, 30, 50, 4);
+		super(handler, x, y);
 		bounds.x = 0;
 		bounds.y = 0;
+		width=30;
+		height=50;
 		bounds.width = width;
 		bounds.height = height;
+		health=maxHealth;
 		this.playerSprite = Assets.player;
 	}
 
 	@Override
 	public void tick() {
+		
+		super.tick();
 		// Movement
 		getInput();
 		
@@ -85,7 +92,8 @@ public class Player extends Creature {
 	public void render(Graphics g) {
 		renderFuel(g);
 		renderPlayer(g);
-		renderHitbox(g);
+		renderHealth(g);
+		//renderHitbox(g);
 	}
 	
 	public void addFuel(float amount){
@@ -105,6 +113,18 @@ public class Player extends Creature {
 		
 		g.setColor(Color.BLACK);
 		g.drawRect(x, 5, 500, 10);
+	}
+	
+	private void renderHealth(Graphics g){
+		g.setColor(Color.BLACK);
+		int x = 32;
+		
+		g.drawString("Health: ", 1, 30);
+		
+		g.setColor(Color.GREEN);
+		g.fillRect(x+10, 20, (int) ((health/maxHealth)*490), 10);
+		g.setColor(Color.BLACK);
+		g.drawRect(x+10, 20, 490, 10);
 	}
 	
 	private void renderPlayer(Graphics g){

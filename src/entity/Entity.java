@@ -88,6 +88,8 @@ public abstract class Entity {
 		}
 		return pos;
 	}
+	
+
 
 	public Point getPosition() {
 		return position;
