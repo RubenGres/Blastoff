@@ -32,6 +32,9 @@ public class MenuState extends State {
 
 	@Override
 	public void tick() {		
+		
+		super.tick();
+		
 		mainMenu.getChoice();
 		
 		if (mainMenu.isSelecting()) {

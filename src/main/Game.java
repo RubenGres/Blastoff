@@ -64,7 +64,7 @@ public class Game implements Runnable {
 
 		this.gameState = new GameState(handler);
 		this.menuState = new MenuState(handler);
-		State.setState(gameState);
+		State.setState(menuState);
 	}
 
 	public int getWidth() {
@@ -176,6 +176,14 @@ public class Game implements Runnable {
 
 	public EntityManager getEntityManager() {
 		return gameState.getEntityManager();
+	}
+	
+	public GameState getGameState() {
+		return gameState;
+	}
+
+	public MenuState getMenuState() {
+		return menuState;
 	}
 
 }

@@ -15,6 +15,7 @@ import entity.EntityManager;
 import entity.FuelTank;
 import entity.creature.Player;
 import main.Handler;
+import states.State;
 import terrain.Cell;
 import terrain.liquid.LiquidCell;
 import utils.Couple;
@@ -27,8 +28,6 @@ public class GameWorld {
 	private Handler handler;
 	private int highestPoint;
 
-	//ArrayList<Couple<Integer>> l; ce n'était pas la solution finale que j'espérait :(
-	
 	public GameWorld(int width, int height, Handler handler) {
 		this.height = height;
 		this.width = width;
@@ -46,20 +45,31 @@ public class GameWorld {
 	}
 
 	public void tick() {
-		flowLiquids();
+		if(State.getState().getFrameTimerManager().getFrameTimer("Lava") == null){
+			State.getState().getFrameTimerManager().add("Lava", true, 30);
+		}
+
+		if(!State.getState().getFrameTimerManager().getFrameTimer("Lava").isRunning()){
+			flowLiquids();
+			State.getState().getFrameTimerManager().getFrameTimer("Lava").restart();
+		}
 	}
 
-	public void flowLiquids(){
-		for (int x = 0; x < width; x++)
-			for (int y = 0; y < height; y++)
-				if (this.getCell(x, y) instanceof LiquidCell){
-					LiquidCell tmp = (LiquidCell) getCell(x, y);
-						flowCell(x, y, tmp);
-				}
-	}
-
-	private void flowCell(int x, int y, LiquidCell currentCell) {
+	public void flowLiquids() {
 		
+		//flow x axis
+		for (int y = 0; y < height; y++)
+			for (int x = 0; x < width; x++)
+				if (this.getCell(x, y) instanceof LiquidCell) {
+					LiquidCell tmp = (LiquidCell) getCell(x, y);
+					x = flowCell(x, y, tmp);
+				}
+		
+		//flow y axis
+	}
+
+	private int flowCell(int x, int y, LiquidCell currentCell) {
+
 		Cell downCell = this.getCell(x, y + 1);
 		Cell leftCell = getCell(x - 1, y);
 		Cell rightCell = getCell(x + 1, y);
@@ -81,8 +91,8 @@ public class GameWorld {
 					flowX = -1;
 
 			} else if (leftCell.equals(Cell.emptyCell)) {
-					flowX = -1;
-				
+				flowX = -1;
+
 			} else if (rightCell.equals(Cell.emptyCell)) {
 				flowX = 1;
 			}
@@ -91,6 +101,11 @@ public class GameWorld {
 
 		this.setCell(x, y, Cell.emptyCell);
 		this.setCell(x + flowX, y + flowY, currentCell);
+
+		if (flowX == 1)
+			x++;
+
+		return x;
 	}
 
 	public void breakCell(int x, int y) {
@@ -120,14 +135,6 @@ public class GameWorld {
 		} catch (Exception e) {
 			return Cell.emptyCell;
 		}
-	}
-
-	public int getWidth() {
-		return this.width;
-	}
-
-	public int getHeight() {
-		return this.height;
 	}
 
 	// GENERATION
@@ -282,6 +289,16 @@ public class GameWorld {
 				return 0;
 		}
 		return y;
+	}
+	
+	//GETTERS AND SETTERS
+
+	public int getWidth() {
+		return this.width;
+	}
+
+	public int getHeight() {
+		return this.height;
 	}
 
 }

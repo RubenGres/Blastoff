@@ -41,6 +41,7 @@ public class GameState extends State {
 
 	@Override
 	public void tick() {
+		super.tick();
 		map.tick();
 		em.tick();
 	}

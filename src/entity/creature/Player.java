@@ -90,10 +90,9 @@ public class Player extends Creature {
 
 	@Override
 	public void render(Graphics g) {
-		renderFuel(g);
+		renderBar(g, 5, 15, "Fuel : ", Color.YELLOW, this.jetpackFuel, this.jetpackMaxFuel);
+		renderBar(g, 5, 35, "Life : ", Color.GREEN, this.health, this.maxHealth);
 		renderPlayer(g);
-		renderHealth(g);
-
 	}
 	
 	public void addFuel(float amount){
@@ -102,29 +101,16 @@ public class Player extends Creature {
 			jetpackFuel = jetpackMaxFuel;
 	}
 	
-	private void renderFuel(Graphics g){
+	private void renderBar(Graphics g, int x, int y, String name, Color c, float current, float max){
 		g.setColor(Color.BLACK);
-		int x = 32;
 		
-		g.drawString("Fuel: ", 1, 15);
+		g.drawString(name, x, y);
+		g.setColor(c);
 		
-		g.setColor(Color.YELLOW);
-		g.fillRect(x, 5, (int) ((jetpackFuel/jetpackMaxFuel)*500), 10);
+		g.fillRect(x, y, (int) ((current/max)*500), 10);
 		
 		g.setColor(Color.BLACK);
-		g.drawRect(x, 5, 500, 10);
-	}
-	
-	private void renderHealth(Graphics g){
-		g.setColor(Color.BLACK);
-		int x = 32;
-		
-		g.drawString("Health: ", 1, 30);
-		
-		g.setColor(Color.GREEN);
-		g.fillRect(x+10, 20, (int) ((health/maxHealth)*490), 10);
-		g.setColor(Color.BLACK);
-		g.drawRect(x+10, 20, 490, 10);
+		g.drawRect(x, y, 500, 10);
 	}
 	
 	private void renderPlayer(Graphics g){

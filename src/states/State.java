@@ -1,8 +1,8 @@
 package states;
 
 import java.awt.Graphics;
-
 import main.Handler;
+import utils.FrameTimerManager;
 
 public abstract class State {
 	// state manager
@@ -11,6 +11,9 @@ public abstract class State {
 	// class
 	protected Handler handler;
 
+	//frametimer manager
+	protected FrameTimerManager ftm = new FrameTimerManager();
+	
 	protected State(Handler handler) {
 		this.handler = handler;
 	}
@@ -23,7 +26,13 @@ public abstract class State {
 		return currentState;
 	}
 
-	public abstract void tick();
+	public void tick(){
+		ftm.tick();
+	}
+
+	public FrameTimerManager getFrameTimerManager() {
+		return ftm;
+	}
 
 	public abstract void render(Graphics g);
 }
