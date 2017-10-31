@@ -10,8 +10,8 @@ import javax.imageio.ImageIO;
 
 import display.Display;
 import entity.EntityManager;
-import entity.FuelTank;
 import entity.creature.Player;
+import entity.pickable.FuelTank;
 import gfx.GameCamera;
 import input.KeyManager;
 import input.MouseManager;

@@ -3,8 +3,9 @@ package states;
 import java.awt.Graphics;
 
 import entity.EntityManager;
-import entity.FuelTank;
 import entity.creature.Player;
+import entity.pickable.FuelTank;
+import entity.pickable.GoldOre;
 import gfx.GameCamera;
 import main.Handler;
 import map.GameWorld;
@@ -33,6 +34,7 @@ public class GameState extends State {
 		Player player = new Player(handler, 0, 0);
 		this.em = new EntityManager(handler, player);
    		em.addEntity(new FuelTank(handler, 220, 10));
+   		em.addEntity(new GoldOre(handler, 300, 10));
 	}
 
 	public EntityManager getEntityManager() {

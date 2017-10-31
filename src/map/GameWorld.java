@@ -12,8 +12,8 @@ import javax.imageio.ImageIO;
 import org.j3d.texture.procedural.PerlinNoiseGenerator;
 
 import entity.EntityManager;
-import entity.FuelTank;
 import entity.creature.Player;
+import entity.pickable.FuelTank;
 import main.Handler;
 import states.State;
 import terrain.Cell;
