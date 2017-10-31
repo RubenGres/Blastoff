@@ -2,6 +2,8 @@ package terrain;
 
 import java.awt.Color;
 import java.awt.Graphics;
+
+import main.Handler;
 import terrain.liquid.*;
 import terrain.ore.GoldCell;
 
@@ -59,6 +61,10 @@ public abstract class Cell {
 	public void render(Graphics g, int x, int y) {
 		g.setColor(this.color);
 		g.fillRect(x, y, CELLWIDTH, CELLHEIGHT);
+	}
+	
+	public void breakCell(int x, int y, Handler handler) {
+		handler.getWorld().breakCell(x / Cell.CELLWIDTH, y / Cell.CELLHEIGHT);
 	}
 
 }

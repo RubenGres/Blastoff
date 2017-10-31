@@ -170,7 +170,7 @@ public class GameWorld {
 		addLayer(0, height - 20, Cell.cobbleCell, 5);
 		addLayer(0, height - 40, Cell.gravelCell, 5);
 		addLayer(0, height - 60, Cell.dirtCell, 5);
-		addLayer(0, this.highestPoint + 15, Cell.sandCell, 10);
+		addLayer(0, this.highestPoint + 15, Cell.goldCell, 10);
 
 		addLavaToBottom(15);
 		addBedrock(); // just to be sure

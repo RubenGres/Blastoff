@@ -83,8 +83,10 @@ public class Player extends Creature {
 			int x = (int) (mm.getMouseX() + xOffset);
 			int y = (int) (mm.getMouseY() + yOffset);
 
-			if (new Point(position.getX() + width/2, position.getY() + height/2).distanceTo(new Point(x, y)) < 100)
-				handler.getWorld().breakCell(x / Cell.CELLWIDTH, y / Cell.CELLHEIGHT);
+			Point block = new Point(position.getX() + width/2, position.getY() + height/2);
+			
+			if (block.distanceTo(new Point(x, y)) < 100)
+				handler.getWorld().getCell( x / Cell.CELLWIDTH, y / Cell.CELLHEIGHT).breakCell(x, y, handler);
 		}
 	}
 

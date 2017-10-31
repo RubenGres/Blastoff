@@ -1,7 +1,5 @@
 package entity.pickable;
 
-import java.awt.image.BufferedImage;
-
 import gfx.Assets;
 import main.Handler;
 
