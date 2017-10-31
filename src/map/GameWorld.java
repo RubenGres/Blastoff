@@ -33,6 +33,8 @@ public class GameWorld {
 		this.width = width;
 		this.handler = handler;
 		Cavegen cv = this.initCv();
+		Cavegen orelode = new Cavegen(50, 50 - surfaceHeight, 0.10f, 0, 5, 3);
+		orelode.show(5);
 		this.generateMap(cv);
 	}
 
