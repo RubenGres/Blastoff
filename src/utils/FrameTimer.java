@@ -47,7 +47,6 @@ public class FrameTimer {
 		
 		if(elapsedTime >= stopTime) {
 			stop();
-			System.out.println("Time out");
 		}
 			
 	}

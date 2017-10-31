@@ -1,24 +1,11 @@
 package map;
 
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-
 import org.j3d.texture.procedural.PerlinNoiseGenerator;
-
-import entity.EntityManager;
-import entity.FuelTank;
-import entity.creature.Player;
 import main.Handler;
 import states.State;
 import terrain.Cell;
 import terrain.liquid.LiquidCell;
-import utils.Couple;
 
 public class GameWorld {
 
@@ -158,7 +145,6 @@ public class GameWorld {
 					this.map[x][y] = Cell.bedrockCell;
 				else
 					this.map[x][y] = Cell.emptyCell;
-
 			}
 
 		addSurfaceLayer(Cell.grassCell);
@@ -168,11 +154,11 @@ public class GameWorld {
 		// Adding layers
 		addLayer(0, height - 7, Cell.stoneCell, Cell.goldCell, 5);
 		addLayer(0, height - 20, Cell.cobbleCell, Cell.goldCell, 5);
-		addLayer(0, height - 40, Cell.gravelCell, Cell.gravelCell, 5);
-		addLayer(0, height - 60, Cell.dirtCell, Cell.dirtCell, 5);
+		addLayer(0, height - 40, Cell.gravelCell, Cell.goldCell, 5);
+		addLayer(0, height - 60, Cell.dirtCell, Cell.goldCell, 5);
 		addLayer(0, this.highestPoint + 15, Cell.sandCell, Cell.goldCell, 10);
 
-		addLavaToBottom(15);
+		addLavaToBottom(height - 10);
 		addBedrock(); // just to be sure
 
 		cleanSurfaceLayer(Cell.grassCell);
@@ -248,9 +234,10 @@ public class GameWorld {
 					this.map[x][y] = cell;
 	}
 
+
 	/**
-	 * Fills a layer with a particular cell and a transitions to the next layer at
-	 * the bottom
+	 * Fills a layer with a particular cell and a transitions to the next layer
+	 * at the bottom
 	 * 
 	 * @param y1
 	 *            Smaller height value of the layer
@@ -259,38 +246,36 @@ public class GameWorld {
 	 * @param cell
 	 *            Cell to fill the layer with
 	 * @param transitionSize
-	 *            Number of lines the transitions will take (included in the layer)
+	 *            Number of lines the transitions will take (included in the
+	 *            layer)
 	 */
 	private void addLayer(int y1, int y2, Cell cell, Cell oreCell, int transitionSize) {
 
-		/*
-		Cavegen orelode = new Cavegen(width, y2, 0.17f, 4, 1, 2);
-
-		for (int y = y1; y < y2; y++)
-			for (int x = 0; x < this.width; x++) {
-				if (orelode.getCellmap()[x][y - y1])
-					this.map[x][y] = oreCell;
-			}
-		*/
+		Cavegen orelode = new Cavegen(width, y2 - y1, 0.17f, 4, 1, 2);
 		
 		for (int x = 0; x < this.width; x++) {
 			int yOffset = getFirstCellOccurence(x, Cell.grassCell) - this.highestPoint;
-			int yMaxLoop;
 
-			yMaxLoop = y2 - transitionSize + yOffset;
+			int yMaxLoop = y2 - transitionSize + yOffset;
 
 			for (int y = y1 + yOffset; y < yMaxLoop; y++) {
 				if (y < height) {
-					if (this.map[x][y] != Cell.emptyCell & this.map[x][y] != Cell.grassCell)
-						this.map[x][y] = cell;
-
+					if (this.map[x][y] != Cell.emptyCell & this.map[x][y] != Cell.grassCell){
+						if(orelode.getCellmap()[x][y - (y1 + yOffset)])
+							this.map[x][y] = oreCell;
+						else
+							this.map[x][y] = cell;
+					}						
 				}
 			}
+			
 
 			int yTransitionEnd = Math.min(height, y2 + yOffset);
 			int yTransitionStart = Math.min(yTransitionEnd, y2 - transitionSize + yOffset);
 			transition(yTransitionStart, yTransitionEnd, x, cell);
 		}
+
+		//addOreLayer(y1, y2, oreCell);
 
 	}
 
