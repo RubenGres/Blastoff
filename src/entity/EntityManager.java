@@ -18,6 +18,7 @@ public class EntityManager {
 	
 	private ArrayList<Entity> entities;
 	private ArrayList<Entity> toRemove = new ArrayList<>();
+	private ArrayList<Entity> toAdd = new ArrayList<>();
 	
 	private Comparator<Entity> renderSorter = new Comparator<Entity>(){
 		@Override
@@ -52,6 +53,9 @@ public class EntityManager {
 		entities.removeAll(toRemove);
 		toRemove = new ArrayList<>();
 		
+		entities.addAll(toAdd);
+		toAdd = new ArrayList<>();
+		
 		entities.sort(renderSorter);
 	}
 
@@ -62,7 +66,7 @@ public class EntityManager {
 	}
 	
 	public void addEntity(Entity e){
-		entities.add(e);
+		toAdd.add(e);
 	}
 	
 	public void removeEntity(Entity e) {
