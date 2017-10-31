@@ -1,24 +1,11 @@
 package map;
 
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-
 import org.j3d.texture.procedural.PerlinNoiseGenerator;
-
-import entity.EntityManager;
-import entity.creature.Player;
-import entity.pickable.FuelTank;
 import main.Handler;
 import states.State;
 import terrain.Cell;
 import terrain.liquid.LiquidCell;
-import utils.Couple;
 
 public class GameWorld {
 
@@ -33,8 +20,7 @@ public class GameWorld {
 		this.width = width;
 		this.handler = handler;
 		Cavegen cv = this.initCv();
-		Cavegen orelode = new Cavegen(50, 50 - surfaceHeight, 0.10f, 0, 5, 3);
-		orelode.show(5);
+
 		this.generateMap(cv);
 	}
 
@@ -47,27 +33,27 @@ public class GameWorld {
 	}
 
 	public void tick() {
-		if(State.getState().getFrameTimerManager().getFrameTimer("Lava") == null){
+		if (State.getState().getFrameTimerManager().getFrameTimer("Lava") == null) {
 			State.getState().getFrameTimerManager().add("Lava", true, 30);
 		}
 
-		if(!State.getState().getFrameTimerManager().getFrameTimer("Lava").isRunning()){
+		if (!State.getState().getFrameTimerManager().getFrameTimer("Lava").isRunning()) {
 			flowLiquids();
 			State.getState().getFrameTimerManager().getFrameTimer("Lava").restart();
 		}
 	}
 
 	public void flowLiquids() {
-		
-		//flow x axis
+
+		// flow x axis
 		for (int y = 0; y < height; y++)
 			for (int x = 0; x < width; x++)
 				if (this.getCell(x, y) instanceof LiquidCell) {
 					LiquidCell tmp = (LiquidCell) getCell(x, y);
 					x = flowCell(x, y, tmp);
 				}
-		
-		//flow y axis
+
+		// flow y axis
 	}
 
 	private int flowCell(int x, int y, LiquidCell currentCell) {
@@ -166,13 +152,13 @@ public class GameWorld {
 		this.highestPoint = this.getHighestPoint(Cell.grassCell);
 
 		// Adding layers
-		addLayer(0, height - 7, Cell.stoneCell, 5);
-		addLayer(0, height - 20, Cell.cobbleCell, 5);
-		addLayer(0, height - 40, Cell.gravelCell, 5);
-		addLayer(0, height - 60, Cell.dirtCell, 5);
-		addLayer(0, this.highestPoint + 15, Cell.goldCell, 10);
+		addLayer(0, height - 7, Cell.stoneCell, Cell.goldCell, 5);
+		addLayer(0, height - 20, Cell.cobbleCell, Cell.goldCell, 5);
+		addLayer(0, height - 40, Cell.gravelCell, Cell.goldCell, 5);
+		addLayer(0, height - 60, Cell.dirtCell, Cell.goldCell, 5);
+		addLayer(0, this.highestPoint + 15, Cell.sandCell, Cell.goldCell, 10);
 
-		addLavaToBottom(15);
+		addLavaToBottom(height - 10);
 		addBedrock(); // just to be sure
 
 		cleanSurfaceLayer(Cell.grassCell);
@@ -248,6 +234,7 @@ public class GameWorld {
 					this.map[x][y] = cell;
 	}
 
+
 	/**
 	 * Fills a layer with a particular cell and a transitions to the next layer
 	 * at the bottom
@@ -262,24 +249,33 @@ public class GameWorld {
 	 *            Number of lines the transitions will take (included in the
 	 *            layer)
 	 */
-	private void addLayer(int y1, int y2, Cell cell, int transitionSize) {
+	private void addLayer(int y1, int y2, Cell cell, Cell oreCell, int transitionSize) {
 
+		Cavegen orelode = new Cavegen(width, y2 - y1, 0.17f, 4, 1, 2);
+		
 		for (int x = 0; x < this.width; x++) {
 			int yOffset = getFirstCellOccurence(x, Cell.grassCell) - this.highestPoint;
-			int yMaxLoop;
 
-			yMaxLoop = y2 - transitionSize + yOffset;
+			int yMaxLoop = y2 - transitionSize + yOffset;
 
 			for (int y = y1 + yOffset; y < yMaxLoop; y++) {
-				if (y < height)
-					if (this.map[x][y] != Cell.emptyCell & this.map[x][y] != Cell.grassCell)
-						this.map[x][y] = cell;
+				if (y < height) {
+					if (this.map[x][y] != Cell.emptyCell & this.map[x][y] != Cell.grassCell){
+						if(orelode.getCellmap()[x][y - (y1 + yOffset)])
+							this.map[x][y] = oreCell;
+						else
+							this.map[x][y] = cell;
+					}						
+				}
 			}
+			
 
 			int yTransitionEnd = Math.min(height, y2 + yOffset);
 			int yTransitionStart = Math.min(yTransitionEnd, y2 - transitionSize + yOffset);
 			transition(yTransitionStart, yTransitionEnd, x, cell);
 		}
+
+		//addOreLayer(y1, y2, oreCell);
 
 	}
 
@@ -292,8 +288,8 @@ public class GameWorld {
 		}
 		return y;
 	}
-	
-	//GETTERS AND SETTERS
+
+	// GETTERS AND SETTERS
 
 	public int getWidth() {
 		return this.width;
