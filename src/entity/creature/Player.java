@@ -3,13 +3,7 @@ package entity.creature;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
 import gfx.Assets;
-import gfx.ImageManipulator;
 import input.MouseManager;
 import main.Handler;
 import physics.Point;
@@ -23,10 +17,11 @@ public class Player extends Creature {
 	private float jetpackMaxFuel = 400;
 	private float jetpackFuel = jetpackMaxFuel;
 	private float jetpackCostPerTick = 0.2f;
+	
 	private float maxHealth = 100;
 
-	
-	private BufferedImage playerSprite;
+	private float cargo = 0;
+	private float maxcargo = 100;
 	
 	private boolean facingLeft;
 
@@ -39,7 +34,6 @@ public class Player extends Creature {
 		bounds.width = width;
 		bounds.height = height;
 		health=maxHealth;
-		this.playerSprite = Assets.player;
 	}
 
 	@Override
@@ -93,8 +87,22 @@ public class Player extends Creature {
 	@Override
 	public void render(Graphics g) {
 		renderBar(g, 5, 15, "Fuel : ", Color.YELLOW, this.jetpackFuel, this.jetpackMaxFuel);
-		renderBar(g, 5, 35, "Life : ", Color.GREEN, this.health, this.maxHealth);
+		renderBar(g, 5, 40, "Life : ", Color.GREEN, this.health, this.maxHealth);
+		renderCargobar(g);
 		renderPlayer(g);
+	}
+	
+	private void renderCargobar(Graphics g){
+		int width = 80;
+		int height = 120;
+		int x = handler.getGame().width - width - 60;
+		int y = handler.getGame().height - height - 60;
+		int yOffset = height - (int) (height * (this.cargo/this.maxcargo));
+		
+		g.fillRect(x, y + yOffset, width, (int) (height * (this.cargo/this.maxcargo)));		
+		g.drawRect(x, y, width, height);
+		g.drawImage(Assets.backpack, x, y, width, height, null);
+		
 	}
 	
 	public void addFuel(float amount){
@@ -109,10 +117,15 @@ public class Player extends Creature {
 		g.drawString(name, x, y);
 		g.setColor(c);
 		
-		g.fillRect(x, y, (int) ((current/max)*500), 10);
+		g.fillRect(x, y + 1, (int) ((current/max)*500), 10);
 		
 		g.setColor(Color.BLACK);
-		g.drawRect(x, y, 500, 10);
+		g.drawRect(x, y + 1, 500, 10);
+	}
+	
+	public void addToCargo(int w){
+		if(this.cargo < this.maxcargo)
+			this.cargo += w;
 	}
 	
 	private void renderPlayer(Graphics g){
@@ -120,10 +133,10 @@ public class Player extends Creature {
 			facingLeft = movement.getX() < 0;
 		
 		if (facingLeft) {
-			g.drawImage(playerSprite, (int) (position.getX() - handler.getGame().getGameCamera().getxOffset()) + width,
+			g.drawImage(Assets.player, (int) (position.getX() - handler.getGame().getGameCamera().getxOffset()) + width,
 					(int) (position.getY() - handler.getGame().getGameCamera().getyOffset()), -width, height, null);
 		} else {
-			g.drawImage(playerSprite, (int) (position.getX() - handler.getGame().getGameCamera().getxOffset()),
+			g.drawImage(Assets.player, (int) (position.getX() - handler.getGame().getGameCamera().getxOffset()),
 					(int) (position.getY() - handler.getGame().getGameCamera().getyOffset()), width, height, null);			
 		}
 	}

@@ -16,7 +16,8 @@ public class Assets {
 	
 	public static  BufferedImage player = loadTexture("res/textures/player.png"),
 			fueltank =  loadTexture("res/textures/fueltank.png"),
-			goldnugget = loadTexture("res/textures/ores/goldnugget.png");
+			goldnugget = loadTexture("res/textures/ores/goldnugget.png"),
+			backpack = loadTexture("res/textures/backpack.png");
 	
 	public static BufferedImage loadTexture(String path){
 		try {

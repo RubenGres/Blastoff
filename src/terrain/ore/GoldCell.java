@@ -15,7 +15,7 @@ public class GoldCell extends Cell {
 
 	@Override
 	public void breakCell(int x, int y, Handler handler) {
-		handler.getGame().getEntityManager().addEntity(new GoldOre(handler, x, y));
+		handler.getGame().getEntityManager().addEntity(new GoldOre(handler, (x / Cell.CELLWIDTH)*Cell.CELLWIDTH, (y / Cell.CELLHEIGHT)*Cell.CELLHEIGHT));
 		super.breakCell(x, y, handler);
 	}
 

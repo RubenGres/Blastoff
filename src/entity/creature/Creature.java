@@ -13,8 +13,9 @@ import terrain.liquid.LavaCell;
 
 public abstract class Creature extends Entity {
 
-	protected float speed ;
-	protected float health ;
+	protected float speed;
+	protected float health;
+	
 	public static final float DEFAULT_SPEED = 5f;
 	public static final int DEFAULT_CREATURE_WIDTH = 64, DEFAULT_CREATURE_HEIGHT = 64;
 	public static final float DEFAULT_HEALTH = 50;

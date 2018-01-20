@@ -20,7 +20,6 @@ public class GameWorld {
 		this.width = width;
 		this.handler = handler;
 		Cavegen cv = this.initCv();
-
 		this.generateMap(cv);
 	}
 
