@@ -23,7 +23,6 @@ public abstract class Cell {
 	public static Cell grassCell = new GrassCell(7);
 
 	// liquid
-	public static Cell lavaCell = new LavaCell(20, 0.2f);
 	public static Cell waterCell = new WaterCell(21, 0.8f);
 
 	// ore

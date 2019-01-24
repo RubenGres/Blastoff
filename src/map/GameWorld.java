@@ -1,10 +1,16 @@
 package map;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.j3d.texture.procedural.PerlinNoiseGenerator;
 import main.Handler;
+import physics.Point;
 import states.State;
 import terrain.Cell;
+import terrain.EmptyCell;
+import terrain.liquid.LavaCell;
 import terrain.liquid.LiquidCell;
 
 public class GameWorld {
@@ -39,61 +45,54 @@ public class GameWorld {
 		if (!State.getState().getFrameTimerManager().getFrameTimer("Lava").isRunning()) {
 			flowLiquids();
 			State.getState().getFrameTimerManager().getFrameTimer("Lava").restart();
-		}
+		} 
 	}
 
 	public void flowLiquids() {
-
+		List<Point> moved = new ArrayList<Point>();
+		
 		// flow x axis
 		for (int y = 0; y < height; y++)
-			for (int x = 0; x < width; x++)
-				if (this.getCell(x, y) instanceof LiquidCell) {
-					LiquidCell tmp = (LiquidCell) getCell(x, y);
-					x = flowCell(x, y, tmp);
-				}
-
-		// flow y axis
-	}
-
-	private int flowCell(int x, int y, LiquidCell currentCell) {
-
-		Cell downCell = this.getCell(x, y + 1);
-		Cell leftCell = getCell(x - 1, y);
-		Cell rightCell = getCell(x + 1, y);
-
-		int flowX = 0;
-		int flowY = 0;
-
-		// flow down
-		if (downCell.equals(Cell.emptyCell)) {
-			flowY = 1;
-		} else { // flow left and right
-
-			if (leftCell.equals(Cell.emptyCell) && rightCell.equals(Cell.emptyCell)) { // random
-																						// if
-																						// both
-																						// possible
-				flowX = (int) (Math.random() * 2);
-				if (flowX == 0)
-					flowX = -1;
-
-			} else if (leftCell.equals(Cell.emptyCell)) {
-				flowX = -1;
-
-			} else if (rightCell.equals(Cell.emptyCell)) {
-				flowX = 1;
+			for (int x = 0; x < width; x++) {
+				
+				if(getCell(x,y) instanceof LiquidCell && !moved.contains(new Point(x, y))) {
+					LiquidCell currentCell = (LiquidCell) getCell(x,y);					
+					LiquidCell curLiquid = (LiquidCell) currentCell;
+					
+					if(getCell(x, y+1) == Cell.emptyCell) {
+						LavaCell newCell = new LavaCell();
+						newCell.level = curLiquid.level;
+						setCell(x, y+1, newCell);
+						setCell(x, y, Cell.emptyCell);
+						moved.add(new Point(x, y+1));
+					}
+					
+					else if(getCell(x, y+1) instanceof LiquidCell && ((LiquidCell) getCell(x, y+1)).level != Byte.MAX_VALUE) {
+						LiquidCell downCell = (LiquidCell) getCell(x, y+1);
+						
+						int down = Math.min(Byte.MAX_VALUE, downCell.level + currentCell.level);
+						int top = Math.max(0, currentCell.level - Byte.MAX_VALUE - downCell.level);
+				
+						downCell.level = (byte) down;
+						currentCell.level = (byte) top;
+					}
+					
+					else if(getCell(x-1, y) == Cell.emptyCell) {
+						LavaCell newCell = new LavaCell();
+						newCell.level = (byte) (curLiquid.level / 2);
+						setCell(x-1, y, newCell);
+						moved.add(new Point(x-1, y));
+					}
+					
+					else if(getCell(x-1,y) instanceof LiquidCell) {
+						LiquidCell leftCell = (LiquidCell) getCell(x-1,y);
+						byte moyenne = (byte) ((currentCell.level + leftCell.level) / 2);
+						leftCell.level = moyenne;
+						currentCell.level = moyenne;
+					}					
+				}				
 			}
-
 		}
-
-		this.setCell(x, y, Cell.emptyCell);
-		this.setCell(x + flowX, y + flowY, currentCell);
-
-		if (flowX == 1)
-			x++;
-
-		return x;
-	}
 
 	public void breakCell(int x, int y) {
 		if (!(this.getCell(x, y) instanceof LiquidCell))
@@ -157,7 +156,7 @@ public class GameWorld {
 		addLayer(0, height - 60, Cell.dirtCell, Cell.goldCell, 5);
 		addLayer(0, this.highestPoint + 15, Cell.sandCell, Cell.goldCell, 10);
 
-		addLavaToBottom(height - 10);
+		addLavaToBottom(10);
 		addBedrock(); // just to be sure
 
 		cleanSurfaceLayer(Cell.grassCell);
@@ -212,7 +211,7 @@ public class GameWorld {
 		for (int y = yStart; y < height; y++)
 			for (int x = 0; x < width; x++)
 				if (this.map[x][y] == Cell.emptyCell)
-					this.map[x][y] = Cell.lavaCell;
+					this.map[x][y] = new LavaCell();
 	}
 
 	private void addBedrock() {

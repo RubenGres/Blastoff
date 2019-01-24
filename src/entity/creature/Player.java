@@ -99,8 +99,9 @@ public class Player extends Creature {
 		int y = handler.getGame().height - height - 60;
 		int yOffset = height - (int) (height * (this.cargo/this.maxcargo));
 		
-		g.fillRect(x, y + yOffset, width, (int) (height * (this.cargo/this.maxcargo)));		
-		g.drawRect(x, y, width, height);
+		g.fillRect(x, y + yOffset,
+				width, (int) (height * (this.cargo/this.maxcargo)));
+		
 		g.drawImage(Assets.backpack, x, y, width, height, null);
 		
 	}
