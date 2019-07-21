@@ -20,8 +20,8 @@ public class MenuState extends State {
 
 	Menu mainMenu;
 
-	public MenuState(Handler handler) {
-		super(handler);
+	public MenuState() {
+		super();
 		init();
 	}
 

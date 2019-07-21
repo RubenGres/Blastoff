@@ -8,22 +8,18 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import gfx.Assets;
+import main.Handler;
+
 public class GrassCell extends Cell {
 
-	BufferedImage grass;
-	
 	public GrassCell(int id) {
-		super(Color.GREEN.darker(), id);
-		try {
-			this.grass = ImageIO.read(new File("res/tiles/grass.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		super(Color.GREEN, id);
+		this.tiles = Assets.grass;
 	}
 	
 	@Override
-	public void render(Graphics g, int x, int y){
-		g.drawImage(grass, x, y, Cell.CELLWIDTH, Cell.CELLHEIGHT, null);
+	public void render(Graphics g, int displayX, int displayY, int x, int y) {
+		super.renderG(g, displayX, displayY, x, y);
 	}
 }

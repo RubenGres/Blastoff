@@ -1,98 +1,52 @@
 package map;
 
 import java.awt.Graphics;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.j3d.texture.procedural.PerlinNoiseGenerator;
 import main.Handler;
-import physics.Point;
 import states.State;
 import terrain.Cell;
-import terrain.EmptyCell;
 import terrain.liquid.LavaCell;
 import terrain.liquid.LiquidCell;
+import utils.FrameTimerManager;
 
 public class GameWorld {
 
 	public int height, width;
 	private Cell[][] map;
-	private int surfaceHeight = 0;
 	private Handler handler;
-	private int highestPoint;
 
-	public GameWorld(int width, int height, Handler handler) {
+	public GameWorld(int width, int height) {
 		this.height = height;
 		this.width = width;
-		this.handler = handler;
-		Cavegen cv = this.initCv();
-		this.generateMap(cv);
+		this.handler = Handler.getInstance();
+		this.map = new Cell[width][height];
+	}
+	
+	public void init() {		
+		MapMaker mapmaker = new MapMaker(this, width, height);
+		mapmaker.generateMap();
+		
+		State.getState().getFrameTimerManager().add(FrameTimerManager.timer.LAVA, true, 30);
 	}
 
-	public void setCell(int x, int y, Cell cell) {
-		try {
-			map[x][y] = cell;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void tick() {
-		if (State.getState().getFrameTimerManager().getFrameTimer("Lava") == null) {
-			State.getState().getFrameTimerManager().add("Lava", true, 30);
-		}
-
-		if (!State.getState().getFrameTimerManager().getFrameTimer("Lava").isRunning()) {
+	public void tick() {		
+		if (!State.getState().getFrameTimerManager().getFrameTimer(FrameTimerManager.timer.LAVA).isRunning()) {
 			flowLiquids();
-			State.getState().getFrameTimerManager().getFrameTimer("Lava").restart();
+			State.getState().getFrameTimerManager().getFrameTimer(FrameTimerManager.timer.LAVA).restart();
 		} 
 	}
 
 	public void flowLiquids() {
-		List<Point> moved = new ArrayList<Point>();
-		
 		// flow x axis
-		for (int y = 0; y < height; y++)
+		for (int y = height-1; y >= 0; y--) {
 			for (int x = 0; x < width; x++) {
-				
-				if(getCell(x,y) instanceof LiquidCell && !moved.contains(new Point(x, y))) {
-					LiquidCell currentCell = (LiquidCell) getCell(x,y);					
-					LiquidCell curLiquid = (LiquidCell) currentCell;
-					
-					if(getCell(x, y+1) == Cell.emptyCell) {
-						LavaCell newCell = new LavaCell();
-						newCell.level = curLiquid.level;
-						setCell(x, y+1, newCell);
-						setCell(x, y, Cell.emptyCell);
-						moved.add(new Point(x, y+1));
-					}
-					
-					else if(getCell(x, y+1) instanceof LiquidCell && ((LiquidCell) getCell(x, y+1)).level != Byte.MAX_VALUE) {
-						LiquidCell downCell = (LiquidCell) getCell(x, y+1);
-						
-						int down = Math.min(Byte.MAX_VALUE, downCell.level + currentCell.level);
-						int top = Math.max(0, currentCell.level - Byte.MAX_VALUE - downCell.level);
-				
-						downCell.level = (byte) down;
-						currentCell.level = (byte) top;
-					}
-					
-					else if(getCell(x-1, y) == Cell.emptyCell) {
-						LavaCell newCell = new LavaCell();
-						newCell.level = (byte) (curLiquid.level / 2);
-						setCell(x-1, y, newCell);
-						moved.add(new Point(x-1, y));
-					}
-					
-					else if(getCell(x-1,y) instanceof LiquidCell) {
-						LiquidCell leftCell = (LiquidCell) getCell(x-1,y);
-						byte moyenne = (byte) ((currentCell.level + leftCell.level) / 2);
-						leftCell.level = moyenne;
-						currentCell.level = moyenne;
-					}					
-				}				
+				if(getCell(x,y) instanceof LiquidCell) {
+					((LiquidCell) getCell(x, y)).flow();
+				}
 			}
 		}
+	}
+	
 
 	public void breakCell(int x, int y) {
 		if (!(this.getCell(x, y) instanceof LiquidCell))
@@ -110,7 +64,7 @@ public class GameWorld {
 		for (int y = yStart; y < yEnd; y++) {
 			for (int x = xStart; x < xEnd; x++) {
 				this.map[x][y].render(g, (int) (x * Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset()),
-						(int) (y * Cell.CELLHEIGHT - handler.getGame().getGameCamera().getyOffset()));
+						(int) (y * Cell.CELLHEIGHT - handler.getGame().getGameCamera().getyOffset()), x, y);
 			}
 		}
 	}
@@ -119,172 +73,17 @@ public class GameWorld {
 		try {
 			return this.map[x][y];
 		} catch (Exception e) {
+			//e.printStackTrace();
 			return Cell.emptyCell;
 		}
 	}
-
-	// GENERATION
-
-	private Cavegen initCv() {
-		float percentFilled = 0.47f; // Percentage of filled cell
-		int birth = 3; // Lives if more than x neighbors
-		int death = 2; // Dies if less than x neighbors
-		int iteration = 2; // Number of iterations
-		return new Cavegen(width, height - surfaceHeight, percentFilled, birth, death, iteration);
-	}
-
-	private void generateMap(Cavegen cv) {
-
-		this.map = new Cell[width][height];
-
-		for (int y = surfaceHeight; y < this.height; y++)
-			for (int x = 0; x < this.width; x++) {
-				if (cv.getCellmap()[x][y - surfaceHeight])
-					this.map[x][y] = Cell.bedrockCell;
-				else
-					this.map[x][y] = Cell.emptyCell;
-			}
-
-		addSurfaceLayer(Cell.grassCell);
-
-		this.highestPoint = this.getHighestPoint(Cell.grassCell);
-
-		// Adding layers
-		addLayer(0, height - 7, Cell.stoneCell, Cell.goldCell, 5);
-		addLayer(0, height - 20, Cell.cobbleCell, Cell.goldCell, 5);
-		addLayer(0, height - 40, Cell.gravelCell, Cell.goldCell, 5);
-		addLayer(0, height - 60, Cell.dirtCell, Cell.goldCell, 5);
-		addLayer(0, this.highestPoint + 15, Cell.sandCell, Cell.goldCell, 10);
-
-		addLavaToBottom(10);
-		addBedrock(); // just to be sure
-
-		cleanSurfaceLayer(Cell.grassCell);
-
-		cv = null;
-	}
-
-	private int getHighestPoint(Cell c) {
-		int min = 0;
-		for (int i = 0; i < width; i++) {
-			int height = getFirstCellOccurence(i, c);
-			if (height < min)
-				min = height;
+	
+	public void setCell(int x, int y, Cell cell) {
+		try {
+			map[x][y] = cell;
+		} catch (Exception e) {
+			//e.printStackTrace();
 		}
-		return min;
-	}
-
-	private void addSurfaceLayer(Cell cell) {
-		int amplitude = 15;
-		int zoom = 9;
-		PerlinNoiseGenerator pnl = new PerlinNoiseGenerator(991283);
-
-		for (int x = 0; x < width; x++) {
-			float noise = pnl.noise1(((float) x) / zoom);
-			int y = (int) (((noise + 1) / 2) * amplitude);
-			this.map[x][y + this.surfaceHeight] = cell;
-		}
-	}
-
-	private void cleanSurfaceLayer(Cell surfaceCell) {
-		for (int x = 0; x < width; x++) {
-
-			int y = 0;
-			// get height of the surfaceLayer on x
-			y = this.getFirstCellOccurence(x, surfaceCell);
-
-			// Clear top cells
-			int a = 1;
-			while (y - a >= 0) {
-				map[x][y - a] = Cell.emptyCell;
-				a++;
-			}
-
-			// Fill bottom cell with sand
-			if (map[x][y + 1] == Cell.emptyCell)
-				map[x][y + 1] = Cell.sandCell;
-
-		}
-	}
-
-	private void addLavaToBottom(int yStart) {
-		for (int y = yStart; y < height; y++)
-			for (int x = 0; x < width; x++)
-				if (this.map[x][y] == Cell.emptyCell)
-					this.map[x][y] = new LavaCell();
-	}
-
-	private void addBedrock() {
-		for (int x = 0; x < this.width; x++)
-			this.map[x][height - 1] = Cell.bedrockCell;
-	}
-
-	private void transition(int yStart, int yEnd, int x, Cell cell) {
-		int size = yEnd - yStart;
-		float[] progressionPercentage = new float[size];
-		for (int i = 0; i < size; i++) {
-			progressionPercentage[i] = 1.6f / i;
-		}
-
-		for (int y = yStart; y < yStart + size; y++)
-			if (this.map[x][y] != Cell.emptyCell & this.map[x][y] != Cell.grassCell)
-				if (Math.random() < progressionPercentage[y - yStart])
-					this.map[x][y] = cell;
-	}
-
-
-	/**
-	 * Fills a layer with a particular cell and a transitions to the next layer
-	 * at the bottom
-	 * 
-	 * @param y1
-	 *            Smaller height value of the layer
-	 * @param y2
-	 *            Biggest height value of the layer
-	 * @param cell
-	 *            Cell to fill the layer with
-	 * @param transitionSize
-	 *            Number of lines the transitions will take (included in the
-	 *            layer)
-	 */
-	private void addLayer(int y1, int y2, Cell cell, Cell oreCell, int transitionSize) {
-
-		Cavegen orelode = new Cavegen(width, y2 - y1, 0.17f, 4, 1, 2);
-		
-		for (int x = 0; x < this.width; x++) {
-			int yOffset = getFirstCellOccurence(x, Cell.grassCell) - this.highestPoint;
-
-			int yMaxLoop = y2 - transitionSize + yOffset;
-
-			for (int y = y1 + yOffset; y < yMaxLoop; y++) {
-				if (y < height) {
-					if (this.map[x][y] != Cell.emptyCell & this.map[x][y] != Cell.grassCell){
-						if(orelode.getCellmap()[x][y - (y1 + yOffset)])
-							this.map[x][y] = oreCell;
-						else
-							this.map[x][y] = cell;
-					}						
-				}
-			}
-			
-
-			int yTransitionEnd = Math.min(height, y2 + yOffset);
-			int yTransitionStart = Math.min(yTransitionEnd, y2 - transitionSize + yOffset);
-			transition(yTransitionStart, yTransitionEnd, x, cell);
-		}
-
-		//addOreLayer(y1, y2, oreCell);
-
-	}
-
-	private int getFirstCellOccurence(int x, Cell cell) {
-		int y = 0;
-		while (map[x][y] != cell) {
-			y++;
-			if (y == height)
-				return 0;
-		}
-		return y;
 	}
 
 	// GETTERS AND SETTERS

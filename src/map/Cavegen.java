@@ -31,6 +31,7 @@ public class Cavegen {
 		for (int i = 0; i < numberOfSteps; i++) {
 			doSimulationStep();
 		}
+		
 		clearSmallCaves();
 	}
 
@@ -75,7 +76,7 @@ public class Cavegen {
 	}
 
 	private void doSimulationStep() {
-		boolean[][] newMap = new boolean[cellmap.length][cellmap[0].length];
+		boolean[][] newMap = new boolean[width][height];
 		// Loop over each row and column of the map
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
@@ -102,8 +103,8 @@ public class Cavegen {
 					cellmap[x][y] = true;
 	}
 
-	public void show(int pixelSize) {
-		DisplayCaves disp = new DisplayCaves(this, pixelSize);
+	public void show() {
+		DisplayCaves disp = new DisplayCaves(this, 4);
 		disp.getAlignmentY();
 	}
 
@@ -123,11 +124,6 @@ public class Cavegen {
 	}
 
 	private class DisplayCaves extends JFrame {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
 		int x, y;
 
 		public DisplayCaves(Cavegen tg, int cellSize) {
@@ -147,7 +143,7 @@ public class Cavegen {
 			boolean[][] array;
 			int cellSize;
 			Color colorAlive = Color.DARK_GRAY;
-			Color colorDead = Color.BLUE;
+			Color colorDead = Color.WHITE;
 
 			private static final long serialVersionUID = 6236075465182952575L;
 
@@ -172,9 +168,6 @@ public class Cavegen {
 					xOffset = 0;
 					yOffset += cellSize;
 				}
-				//long stop = System.currentTimeMillis();
-				// System.out.println("Binary display took " + (int)
-				// (stop-start) + "ms");
 			}
 
 		}

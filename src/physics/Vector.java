@@ -18,6 +18,14 @@ public class Vector {
 	public Vector multiply(float f){
 		return new Vector(this.x * f, this.y * f);
 	}
+	
+	public Vector normalize() {
+		return this.multiply(1/this.length());
+	}
+	
+	public float length() {
+		return (float) Math.sqrt(this.x * this.x + this.y * this.y);
+	}
 
 	public float getX() {
 		return x;

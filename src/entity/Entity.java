@@ -19,8 +19,8 @@ public abstract class Entity {
 	protected Rectangle bounds;
 	protected boolean hitbox;
 
-	public Entity(Handler handler, float x, float y, int width, int height, boolean hitbox) {
-		this.handler = handler;
+	public Entity(float x, float y, int width, int height, boolean hitbox) {
+		this.handler = Handler.getInstance();
 		position = new Point(x, y);
 		this.width = width;
 		this.height = height;
@@ -52,6 +52,7 @@ public abstract class Entity {
 	}
 
 	public Point avoidCollision(Point pos, Vector mov) {
+		/* apply viscuosity */
 		mov = mov.multiply(handler.getWorld()
 				.getCell((int) (position.getX() / Cell.CELLWIDTH), (int) (position.getY()) / Cell.CELLHEIGHT)
 				.getViscuosity());

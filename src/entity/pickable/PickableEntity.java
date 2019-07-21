@@ -13,8 +13,8 @@ public abstract class PickableEntity extends Entity{
 	
 	private BufferedImage texture;
 
-	public PickableEntity(Handler handler, float x, float y, int width, int height, BufferedImage texture) {
-		super(handler, x, y, width, height, true);
+	public PickableEntity(float x, float y, int width, int height, BufferedImage texture) {
+		super(x, y, width, height, true);
 		this.texture = texture;
 	}
 

@@ -36,7 +36,6 @@ public class Game implements Runnable {
 	private Graphics g;
 
 	// handler
-	private Handler handler;
 	private KeyManager keyManager;
 	private MouseManager mouseManager;
 
@@ -60,11 +59,14 @@ public class Game implements Runnable {
 		display.getCanvas().addMouseListener(mouseManager);
 		display.getCanvas().addMouseMotionListener(mouseManager);
 
-		handler = new Handler(this);
-
-		this.gameState = new GameState(handler);
-		this.menuState = new MenuState(handler);
-		State.setState(menuState);
+		Handler.getInstance(this);
+		
+		this.gameState = new GameState();
+		this.menuState = new MenuState();
+		
+		State.setState(gameState);
+		
+		gameState.init();
 	}
 
 	public int getWidth() {

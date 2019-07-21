@@ -9,8 +9,8 @@ public class GameCamera {
 	private Handler handler;
 	private float xOffset, yOffset;
 	
-	public GameCamera(Handler handler){
-		this.handler = handler;
+	public GameCamera(){
+		this.handler = Handler.getInstance();
 		xOffset = 0;
 		yOffset = 0;
 	}

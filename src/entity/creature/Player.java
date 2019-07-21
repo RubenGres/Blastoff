@@ -17,6 +17,7 @@ public class Player extends Creature {
 	private float jetpackMaxFuel = 400;
 	private float jetpackFuel = jetpackMaxFuel;
 	private float jetpackCostPerTick = 0.2f;
+	private int playerRange = 1000000;
 	
 	private float maxHealth = 100;
 
@@ -25,14 +26,14 @@ public class Player extends Creature {
 	
 	private boolean facingLeft;
 
-	public Player(Handler handler, float x, float y) {
-		super(handler, x, y);
+	public Player(float x, float y) {
+		super(x, y);
 		bounds.x = 0;
-		bounds.y = 0;
+		bounds.y = 15;
 		width=30;
-		height=50;
+		height=54;
 		bounds.width = width;
-		bounds.height = height;
+		bounds.height = 39;
 		health=maxHealth;
 	}
 
@@ -40,9 +41,9 @@ public class Player extends Creature {
 	public void tick() {
 		
 		super.tick();
-		// Movement
-		getInput();
 		
+		// Movement
+		getInput();		
 		move(movement);
 
 		handler.getGame().getGameCamera().centerOnEntity(this);
@@ -50,37 +51,37 @@ public class Player extends Creature {
 	}
 
 	private void getInput() {
-		MouseManager mm = handler
-				.getGame()
-				.getMouseManager();
+		MouseManager mm = this.handler.getGame().getMouseManager();
 
 		resetMovement();
 
-		if (handler.getGame().getKeyManager().jetpack){
-			if(jetpackFuel > 0){
-				movement = movement.add(new Vector(0, -jetpackSpeed));
-				jetpackFuel -= jetpackCostPerTick;
-				if(jetpackFuel < 0)
-					jetpackFuel = 0;
-			}
+		if (handler.getGame().getKeyManager().jetpack && jetpackFuel > 0){
+				this.movement = this.movement.add(new Vector(0, -this.jetpackSpeed));
+				this.jetpackFuel -= this.jetpackCostPerTick;
+				
+				if(this.jetpackFuel < 0)
+					this.jetpackFuel = 0;
 		}
 
 		if (handler.getGame().getKeyManager().right)
-			movement = movement.add(new Vector(speed, 0));
+			this.movement = this.movement.add(new Vector(this.speed, 0));
 
 		if (handler.getGame().getKeyManager().left)
-			movement = movement.add(new Vector(-speed, 0));
-
+			this.movement = this.movement.add(new Vector(-this.speed, 0));
+		
+		this.movement = this.movement.normalize().multiply(speed);
+		
+		/* casse une cellule */
 		if (mm.isLeftPressed()) {
-			float xOffset = handler.getGame().getGameCamera().getxOffset();
-			float yOffset = handler.getGame().getGameCamera().getyOffset();
+			float xOffset = this.handler.getGame().getGameCamera().getxOffset();
+			float yOffset = this.handler.getGame().getGameCamera().getyOffset();
 			int x = (int) (mm.getMouseX() + xOffset);
 			int y = (int) (mm.getMouseY() + yOffset);
 
-			Point block = new Point(position.getX() + width/2, position.getY() + height/2);
+			Point block = new Point(this.position.getX() + this.width/2, this.position.getY() + this.height/2);
 			
-			if (block.distanceTo(new Point(x, y)) < 100)
-				handler.getWorld().getCell( x / Cell.CELLWIDTH, y / Cell.CELLHEIGHT).breakCell(x, y, handler);
+			if (block.distanceTo(new Point(x, y)) < this.playerRange)
+				this.handler.getWorld().getCell(x / Cell.CELLWIDTH, y / Cell.CELLHEIGHT).breakCell(x, y, this.handler);
 		}
 	}
 
@@ -133,12 +134,15 @@ public class Player extends Creature {
 		if(movement.getX() != 0)
 			facingLeft = movement.getX() < 0;
 		
+		int x = (int) (position.getX() - handler.getGame().getGameCamera().getxOffset());
+		int y = (int) (position.getY() - handler.getGame().getGameCamera().getyOffset());
+		
 		if (facingLeft) {
-			g.drawImage(Assets.player, (int) (position.getX() - handler.getGame().getGameCamera().getxOffset()) + width,
-					(int) (position.getY() - handler.getGame().getGameCamera().getyOffset()), -width, height, null);
+			g.drawImage(Assets.player, x  + width, y, -width, height, null);
 		} else {
-			g.drawImage(Assets.player, (int) (position.getX() - handler.getGame().getGameCamera().getxOffset()),
-					(int) (position.getY() - handler.getGame().getGameCamera().getyOffset()), width, height, null);			
+			g.drawImage(Assets.player, x, y, width, height, null);		
 		}
+		
+		//g.drawRect(x + bounds.x, y + bounds.y, this.bounds.width, this.bounds.height);
 	}
 }

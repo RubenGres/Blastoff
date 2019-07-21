@@ -2,13 +2,13 @@ package utils;
 
 public class FrameTimer {
 	
-	private long stopTime;
+	private long duration;
 	private boolean running;
 	private long elapsedTime = 0;
 	
-	public FrameTimer(boolean autostart, long stopTime){
+	public FrameTimer(boolean autostart, long duration){
 		this.running = autostart;
-		this.stopTime = stopTime;
+		this.duration = duration;
 	}
 	
 	public void start(){
@@ -28,8 +28,8 @@ public class FrameTimer {
 		return elapsedTime;
 	}
 	
-	public long getStopTime(){
-		return stopTime;
+	public long getDuration(){
+		return duration;
 	}
 	
 	public void restart(){
@@ -45,7 +45,7 @@ public class FrameTimer {
 		if(running)
 			elapsedTime++;
 		
-		if(elapsedTime >= stopTime) {
+		if(elapsedTime >= duration) {
 			stop();
 		}
 			

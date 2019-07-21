@@ -6,7 +6,6 @@ public class BedrockCell extends Cell {
 
 	public BedrockCell(int id) {
 		super(Color.BLACK, id);
-		// TODO Auto-generated constructor stub
 	}
 
 }

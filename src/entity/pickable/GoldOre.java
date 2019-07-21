@@ -5,11 +5,12 @@ import main.Handler;
 
 public class GoldOre extends PickableEntity {
 
+	public static int WIDTH = 20, HEIGHT = 20;
 	private int weight = 10;
 	private int value;
 	
-	public GoldOre(Handler handler, float x, float y) {
-		super(handler, x, y, 30, 30, Assets.goldnugget);
+	public GoldOre(float x, float y) {
+		super(x, y, WIDTH, HEIGHT, Assets.goldnugget);
 	}
 
 	@Override

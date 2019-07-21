@@ -6,8 +6,8 @@ public class FuelTank extends PickableEntity{
 
 	private int capacity = 20;
 	
-	public FuelTank(Handler handler, float x, float y) {
-		super(handler, x, y, 30, 40, Assets.fueltank);
+	public FuelTank(float x, float y) {
+		super(x, y, 30, 40, Assets.fueltank);
 	}
 
 	@Override

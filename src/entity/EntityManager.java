@@ -29,8 +29,8 @@ public class EntityManager {
 		}
 	};
 	
-	public EntityManager(Handler handler, Player player){
-		this.handler = handler;
+	public EntityManager(Player player){
+		this.handler = Handler.getInstance();
 		this.player = player;
 		entities = new ArrayList<Entity>();
 		addEntity(player);

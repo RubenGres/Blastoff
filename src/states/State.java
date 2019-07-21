@@ -12,10 +12,11 @@ public abstract class State {
 	protected Handler handler;
 
 	//frametimer manager
-	protected FrameTimerManager ftm = new FrameTimerManager();
+	protected FrameTimerManager ftm;
 	
-	protected State(Handler handler) {
-		this.handler = handler;
+	protected State() {
+		this.handler = Handler.getInstance();
+		this.ftm = new FrameTimerManager();
 	}
 
 	public static void setState(State state) {

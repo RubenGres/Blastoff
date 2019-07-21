@@ -3,16 +3,27 @@ package main;
 import map.GameWorld;
 
 public class Handler {
+	
+	private static Handler instance;
 
 	private Game game;
-	private GameWorld world;
-
-	public Handler(Game game) {
+	
+	private Handler(Game game) {
 		this.game = game;
 	}
-
-	public void setWorld(GameWorld world) {
-		this.world = world;
+	
+	public static Handler getInstance(Game game) {
+		if(instance == null)
+			instance = new Handler(game);
+			
+		return instance;
+	}
+	
+	public static Handler getInstance() {
+		if(instance == null)
+			throw new IllegalArgumentException("Handler instance has no game attached");
+			
+		return instance;
 	}
 
 	public Game getGame() {

@@ -3,8 +3,8 @@ import java.awt.Color;
 
 public class WaterCell extends LiquidCell{
 
-	public WaterCell(int id, float visc) {
-		super(Color.blue, id, visc);
+	public WaterCell(int x, int y) {
+		super(x, y, Color.blue, 21, 0.7f);
 		// TODO Auto-generated constructor stub
 	}
 

@@ -5,23 +5,24 @@ import java.util.Map;
 public class FrameTimerManager {
 
 	//frametimer manager
-	private Map<String,FrameTimer> frametimers;
+	public static enum timer {LAVA, WATER};
+	private Map<timer, FrameTimer> frametimers;
 	
 	public FrameTimerManager(){
-		this.frametimers = new HashMap<String,FrameTimer>();
+		this.frametimers = new HashMap<timer,FrameTimer>();
 	}
 	
 	public void tick(){
-		for(String str : frametimers.keySet())
-			frametimers.get(str).tick();
+		for(timer k : frametimers.keySet())
+			frametimers.get(k).tick();
 	}
 	
-	public void add(String key, boolean autostart, long stopTime){
-		frametimers.put(key, new FrameTimer(autostart, stopTime));
+	public void add(timer key, boolean autostart, long duration){
+		frametimers.put(key, new FrameTimer(autostart, duration));
 	}
 	
-	public FrameTimer getFrameTimer(String key){
-		return frametimers.get(key);
+	public FrameTimer getFrameTimer(timer lava){
+		return frametimers.get(lava);
 	}
 	
 	public void removeFrameTimer(String key){

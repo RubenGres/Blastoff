@@ -6,6 +6,7 @@ import entity.EntityManager;
 import entity.creature.Player;
 import entity.pickable.FuelTank;
 import entity.pickable.GoldOre;
+import gfx.Assets;
 import gfx.GameCamera;
 import main.Handler;
 import map.GameWorld;
@@ -22,19 +23,22 @@ public class GameState extends State {
 	//entity manager
 	EntityManager em;
 	
-	public GameState(Handler handler) {
-		super(handler);
-		gameCamera = new GameCamera(handler);
-		map = new GameWorld(worldWidth, worldHeight, handler);
-
-		init();
+	public GameState() {
+		super();
+		Assets.preload();
 	}
 	
 	public void init(){
-		Player player = new Player(handler, 0, 0);
-		this.em = new EntityManager(handler, player);
-   		em.addEntity(new FuelTank(handler, 220, 10));
-   		em.addEntity(new GoldOre(handler, 300, 10));
+		this.map = new GameWorld(worldWidth, worldHeight);
+		this.map.init();
+		
+		this.em = new EntityManager(new Player(0, 0));
+
+		gameCamera = new GameCamera();
+		
+   		em.addEntity(new FuelTank(220, 10));
+   		em.addEntity(new GoldOre(300, 10));
+   		
 	}
 
 	public EntityManager getEntityManager() {
