@@ -1,12 +1,13 @@
 package terrain;
 
 import java.awt.Color;
+import java.awt.Graphics;
+
+import gfx.Assets;
 
 public class StoneCell extends Cell{
 
 	public StoneCell(int id) {
-		super(Color.DARK_GRAY, id);
-		// TODO Auto-generated constructor stub
+		super(Assets.stone, id);
 	}
-
 }

@@ -1,14 +1,10 @@
 package terrain;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
 
-import gfx.Assets;
 import main.Handler;
 import map.GameWorld;
-import terrain.liquid.*;
 import terrain.ore.GoldCell;
 
 public abstract class Cell {
@@ -32,18 +28,21 @@ public abstract class Cell {
 	public static final int CELLWIDTH = 45, CELLHEIGHT = 45;
 
 	// CLASS
-	protected Color color;
 	protected final int id;
+	protected final int resistance = 10;
 	
 	protected BufferedImage[][] tiles;
-
-	public Cell(Color color, int id) {
-		this.color = color;
+	
+	public Cell(BufferedImage[][] tiles, int id) {
 		this.id = id;
 		cells[id] = this;
+		this.tiles = tiles;
 	}
-	
+
 	public static BufferedImage getTileImage(BufferedImage[][] tiles, int tileid) {
+		if(tiles == null)
+			return null;
+		
 		if(tileid==0b0000) return tiles[0][0];		
 		if(tileid==0b0001) return tiles[1][3];
 		if(tileid==0b0010) return tiles[1][2];
@@ -80,7 +79,7 @@ public abstract class Cell {
 		return 1;
 	}
 
-	public void renderG(Graphics g, int displayX, int displayY, int x, int y) {
+	public void render(Graphics g, int displayX, int displayY, int x, int y) {
 		GameWorld world = Handler.getInstance().getWorld();
 		
 		int tileid = 0b0000;
@@ -99,13 +98,12 @@ public abstract class Cell {
 		g.drawImage(Cell.getTileImage(this.tiles, tileid), displayX, displayY, Cell.CELLWIDTH, Cell.CELLHEIGHT, null);
 	}
 	
-	public void render(Graphics g, int displayX, int displayY, int x, int y) {
-		g.setColor(this.color);
-		g.fillRect(displayX, displayY, CELLWIDTH, CELLHEIGHT);
-	}
-	
 	public void breakCell(int x, int y, Handler handler) {
-		handler.getWorld().breakCell(x / Cell.CELLWIDTH, y / Cell.CELLHEIGHT);
+		handler.getWorld().breakCell(x, y);
+	}
+
+	public int getResistance() {
+		return this.resistance;
 	}
 
 }

@@ -5,7 +5,7 @@ import java.util.Map;
 public class FrameTimerManager {
 
 	//frametimer manager
-	public static enum timer {LAVA, WATER};
+	public static enum timer {LAVA, WATER, BREAKING};
 	private Map<timer, FrameTimer> frametimers;
 	
 	public FrameTimerManager(){
@@ -21,11 +21,11 @@ public class FrameTimerManager {
 		frametimers.put(key, new FrameTimer(autostart, duration));
 	}
 	
-	public FrameTimer getFrameTimer(timer lava){
-		return frametimers.get(lava);
+	public FrameTimer getFrameTimer(timer key){
+		return frametimers.get(key);
 	}
 	
-	public void removeFrameTimer(String key){
+	public void removeFrameTimer(timer key){
 		frametimers.remove(key);
 	}
 	

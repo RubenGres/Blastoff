@@ -1,12 +1,11 @@
 package terrain;
 
-import java.awt.Color;
+import gfx.Assets;
 
 public class CobbleCell extends Cell {
 
 	public CobbleCell(int id) {
-		super(Color.GRAY, id);
-		// TODO Auto-generated constructor stub
+		super(Assets.cobble, id);
 	}
 
 }

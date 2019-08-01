@@ -1,23 +1,25 @@
 package entity.creature;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import gfx.Assets;
 import input.MouseManager;
-import main.Handler;
 import physics.Point;
 import physics.Vector;
 import terrain.Cell;
+import terrain.EmptyCell;
+import utils.FrameTimer;
+import utils.FrameTimerManager;
 
 public class Player extends Creature {
 
 	//jetpack
 	private float jetpackSpeed = 8.3f;
 	private float jetpackMaxFuel = 400;
-	private float jetpackFuel = jetpackMaxFuel;
+	private float jetpackFuel = getJetpackMaxFuel();
 	private float jetpackCostPerTick = 0.2f;
-	private int playerRange = 1000000;
+	private int playerRange = 5 * Cell.CELLHEIGHT;
+	
+	private Point breaking = null;
 	
 	private float maxHealth = 100;
 
@@ -34,7 +36,7 @@ public class Player extends Creature {
 		height=54;
 		bounds.width = width;
 		bounds.height = 39;
-		health=maxHealth;
+		setHealth(getMaxHealth());
 	}
 
 	@Override
@@ -55,12 +57,12 @@ public class Player extends Creature {
 
 		resetMovement();
 
-		if (handler.getGame().getKeyManager().jetpack && jetpackFuel > 0){
+		if (handler.getGame().getKeyManager().jetpack && getJetpackFuel() > 0){
 				this.movement = this.movement.add(new Vector(0, -this.jetpackSpeed));
-				this.jetpackFuel -= this.jetpackCostPerTick;
+				this.setJetpackFuel(this.getJetpackFuel() - this.jetpackCostPerTick);
 				
-				if(this.jetpackFuel < 0)
-					this.jetpackFuel = 0;
+				if(this.getJetpackFuel() < 0)
+					this.setJetpackFuel(0);
 		}
 
 		if (handler.getGame().getKeyManager().right)
@@ -77,57 +79,51 @@ public class Player extends Creature {
 			float yOffset = this.handler.getGame().getGameCamera().getyOffset();
 			int x = (int) (mm.getMouseX() + xOffset);
 			int y = (int) (mm.getMouseY() + yOffset);
-
-			Point block = new Point(this.position.getX() + this.width/2, this.position.getY() + this.height/2);
-			
-			if (block.distanceTo(new Point(x, y)) < this.playerRange)
-				this.handler.getWorld().getCell(x / Cell.CELLWIDTH, y / Cell.CELLHEIGHT).breakCell(x, y, this.handler);
+			breakCell(x/Cell.CELLWIDTH, y/Cell.CELLHEIGHT);
+		} else {
+			handler.getGame().getGameState().getFrameTimerManager().removeFrameTimer(FrameTimerManager.timer.BREAKING);
+			this.setBreaking(null);
+		}
+	}
+	
+	private void breakCell(int x, int y) {
+		Cell cell = handler.getWorld().getCell(x, y);
+		if(cell instanceof EmptyCell) {
+			return;
+		}
+		
+		Point clickedCell = new Point(x, y);
+		Point playerCenter = new Point(this.position.getX() + this.width/2, this.position.getY() + this.height/2);
+		if (playerCenter.distanceTo(new Point(x * Cell.CELLHEIGHT, y * Cell.CELLWIDTH)) < this.playerRange) {
+			FrameTimerManager ftm = handler.getGame().getGameState().getFrameTimerManager();
+			if(clickedCell.equals(this.getBreaking())) { //same cell
+				FrameTimer breaking = ftm.getFrameTimer(FrameTimerManager.timer.BREAKING);			
+				if(!breaking.isRunning()) {
+					this.handler.getWorld().getCell(x, y).breakCell(x, y, this.handler);
+					ftm.removeFrameTimer(FrameTimerManager.timer.BREAKING);
+					this.setBreaking(null);
+				}
+			} else { //new cell
+				ftm.add(FrameTimerManager.timer.BREAKING, true, cell.getResistance());
+				this.setBreaking(clickedCell);
+			}
 		}
 	}
 
 	@Override
 	public void render(Graphics g) {
-		renderBar(g, 5, 15, "Fuel : ", Color.YELLOW, this.jetpackFuel, this.jetpackMaxFuel);
-		renderBar(g, 5, 40, "Life : ", Color.GREEN, this.health, this.maxHealth);
-		renderCargobar(g);
 		renderPlayer(g);
-	}
-	
-	private void renderCargobar(Graphics g){
-		int width = 80;
-		int height = 120;
-		int x = handler.getGame().width - width - 60;
-		int y = handler.getGame().height - height - 60;
-		int yOffset = height - (int) (height * (this.cargo/this.maxcargo));
-		
-		g.fillRect(x, y + yOffset,
-				width, (int) (height * (this.cargo/this.maxcargo)));
-		
-		g.drawImage(Assets.backpack, x, y, width, height, null);
-		
-	}
+	}	
 	
 	public void addFuel(float amount){
-		jetpackFuel += amount;
-		if(jetpackFuel > jetpackMaxFuel)
-			jetpackFuel = jetpackMaxFuel;
-	}
-	
-	private void renderBar(Graphics g, int x, int y, String name, Color c, float current, float max){
-		g.setColor(Color.BLACK);
-		
-		g.drawString(name, x, y);
-		g.setColor(c);
-		
-		g.fillRect(x, y + 1, (int) ((current/max)*500), 10);
-		
-		g.setColor(Color.BLACK);
-		g.drawRect(x, y + 1, 500, 10);
+		setJetpackFuel(getJetpackFuel() + amount);
+		if(getJetpackFuel() > getJetpackMaxFuel())
+			setJetpackFuel(getJetpackMaxFuel());
 	}
 	
 	public void addToCargo(int w){
-		if(this.cargo < this.maxcargo)
-			this.cargo += w;
+		if(this.getCargo() < this.getMaxcargo())
+			this.setCargo(this.getCargo() + w);
 	}
 	
 	private void renderPlayer(Graphics g){
@@ -144,5 +140,55 @@ public class Player extends Creature {
 		}
 		
 		//g.drawRect(x + bounds.x, y + bounds.y, this.bounds.width, this.bounds.height);
+	}
+
+	/* getters and setters */
+	
+	public float getCargo() {
+		return cargo;
+	}
+
+	public void setCargo(float cargo) {
+		this.cargo = cargo;
+	}
+
+	public float getMaxcargo() {
+		return maxcargo;
+	}
+
+	public void setMaxcargo(float maxcargo) {
+		this.maxcargo = maxcargo;
+	}
+
+	public float getMaxHealth() {
+		return maxHealth;
+	}
+
+	public void setMaxHealth(float maxHealth) {
+		this.maxHealth = maxHealth;
+	}
+
+	public float getJetpackFuel() {
+		return jetpackFuel;
+	}
+
+	public void setJetpackFuel(float jetpackFuel) {
+		this.jetpackFuel = jetpackFuel;
+	}
+
+	public float getJetpackMaxFuel() {
+		return jetpackMaxFuel;
+	}
+
+	public void setJetpackMaxFuel(float jetpackMaxFuel) {
+		this.jetpackMaxFuel = jetpackMaxFuel;
+	}
+
+	public Point getBreaking() {
+		return breaking;
+	}
+
+	public void setBreaking(Point breaking) {
+		this.breaking = breaking;
 	}
 }

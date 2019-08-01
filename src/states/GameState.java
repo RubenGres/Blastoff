@@ -1,5 +1,6 @@
 package states;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import entity.EntityManager;
@@ -8,8 +9,10 @@ import entity.pickable.FuelTank;
 import entity.pickable.GoldOre;
 import gfx.Assets;
 import gfx.GameCamera;
+import gfx.GameInterface;
 import main.Handler;
 import map.GameWorld;
+import physics.Point;
 
 public class GameState extends State {
 	
@@ -54,8 +57,15 @@ public class GameState extends State {
 
 	@Override
 	public void render(Graphics g) {
+		int screenW = handler.getGame().getWidth();
+		int screenH = handler.getGame().getHeight();
+		
+		g.drawImage(Assets.bkg, 0, 0, screenW, screenH, null);
 		map.render(g);
+		
 		em.render(g);
+		
+		GameInterface.render(g);		
 	}
 	
 	public GameWorld getMap(){

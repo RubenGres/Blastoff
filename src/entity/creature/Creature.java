@@ -14,7 +14,7 @@ import terrain.liquid.LavaCell;
 public abstract class Creature extends Entity {
 
 	protected float speed;
-	protected float health;
+	private float health;
 	
 	public static final float DEFAULT_SPEED = 5f;
 	public static final int DEFAULT_CREATURE_WIDTH = 64, DEFAULT_CREATURE_HEIGHT = 64;
@@ -23,7 +23,7 @@ public abstract class Creature extends Entity {
 	public Creature(float x, float y) {
 		super(x, y, DEFAULT_CREATURE_WIDTH, DEFAULT_CREATURE_HEIGHT, true);
 		this.speed = DEFAULT_SPEED;
-		this.health = DEFAULT_HEALTH;
+		this.setHealth(DEFAULT_HEALTH);
 		
 	}
 
@@ -42,14 +42,22 @@ public abstract class Creature extends Entity {
 	}
 	
 	public void hurt(float damage){
-		health-=damage;	
+		setHealth(getHealth() - damage);	
 	}
 	
 	public void checkDeath(){
 		
-		if(health<0){
+		if(getHealth()<0){
 			State.setState(handler.getGame().menuState);
 		}
 
+	}
+
+	public float getHealth() {
+		return health;
+	}
+
+	public void setHealth(float health) {
+		this.health = health;
 	}
 }

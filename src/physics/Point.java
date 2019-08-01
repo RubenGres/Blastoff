@@ -2,7 +2,6 @@ package physics;
 
 public class Point {
 
-
 	private float x, y;
 	
 	public Point(float x, float y) {
@@ -48,6 +47,11 @@ public class Point {
 		if (Float.floatToIntBits(y) != Float.floatToIntBits(other.y))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return "[" + x + "," + y + "]";
 	}
 
 }

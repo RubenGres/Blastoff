@@ -15,6 +15,7 @@ public abstract class LiquidCell extends EmptyCell {
 	public float viscuosity;
 	public byte level;
 	public int x, y;
+	private Color color;
 
 	public LiquidCell(int x, int y, Color color, int id, float viscuosity) {
 		super(id);
@@ -115,11 +116,12 @@ public abstract class LiquidCell extends EmptyCell {
 				int sum = this.level + rightLiquid.level + leftLiquid.level;
 				byte newLevel = (byte) (sum/3);
 				
-				leftLiquid.level = newLevel;
-				rightLiquid.level = newLevel;
-				this.level = newLevel;
-				
-				this.level += sum % 3;
+				if(newLevel != 0) {
+					leftLiquid.level = newLevel;
+					rightLiquid.level = newLevel;
+					this.level = newLevel;					
+					this.level += sum % 3;
+				}	
 			}
 
 			/*****************************/

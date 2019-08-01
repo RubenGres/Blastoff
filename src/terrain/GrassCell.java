@@ -14,12 +14,6 @@ import main.Handler;
 public class GrassCell extends Cell {
 
 	public GrassCell(int id) {
-		super(Color.GREEN, id);
-		this.tiles = Assets.grass;
-	}
-	
-	@Override
-	public void render(Graphics g, int displayX, int displayY, int x, int y) {
-		super.renderG(g, displayX, displayY, x, y);
+		super(Assets.grass, id);
 	}
 }
