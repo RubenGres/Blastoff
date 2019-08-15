@@ -1,24 +1,12 @@
 package entity.pickable;
 
 import gfx.Assets;
-import main.Handler;
 
-public class GoldOre extends PickableEntity {
-
-	public static int WIDTH = 20, HEIGHT = 20;
-	private int weight = 10;
-	private int value;
-	
+public class GoldOre extends Ore {
+		
 	public GoldOre(float x, float y) {
-		super(x, y, WIDTH, HEIGHT, Assets.goldnugget);
-	}
-
-	@Override
-	public void onCollision() {
-		handler.getGame().getEntityManager().getPlayer().addToCargo(weight);
-		handler.getGame().getEntityManager().removeEntity(this);		
-	}
-
-	
-	
+		super(x, y, WIDTH, HEIGHT, Assets.goldore);
+		this.weight = 10;
+		this.value = 100;
+	}	
 }

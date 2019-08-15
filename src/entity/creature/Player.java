@@ -1,31 +1,51 @@
 package entity.creature;
 
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+
+import drill.Drill;
+import entity.pickable.Ore;
+import gfx.Animation;
 import gfx.Assets;
 import input.MouseManager;
 import physics.Point;
 import physics.Vector;
 import terrain.Cell;
 import terrain.EmptyCell;
+import terrain.ore.OreCell;
 import utils.FrameTimer;
 import utils.FrameTimerManager;
 
 public class Player extends Creature {
 
-	//jetpack
+	/* jetpack */
 	private float jetpackSpeed = 8.3f;
-	private float jetpackMaxFuel = 400;
-	private float jetpackFuel = getJetpackMaxFuel();
+	private float maxfuel = 400;
+	private float fuel = getMaxFuel();
 	private float jetpackCostPerTick = 0.2f;
-	private int playerRange = 5 * Cell.CELLHEIGHT;
 	
+	private int playerRange = 75;
+
+	/* mining */
+	private float miningSpeed = 1;
 	private Point breaking = null;
+	private Drill drill;
 	
 	private float maxHealth = 100;
 
-	private float cargo = 0;
-	private float maxcargo = 100;
+	/* money */
+	private int money = 0;
 	
+	/* cargo */
+	private float cargosize = 0;
+	private float maxcargo = 100;
+	private List<Ore> cargo;
+	
+	/* render */
+	private Animation animation;
+	private static int ANIMSPEED = 10;
 	private boolean facingLeft;
 
 	public Player(float x, float y) {
@@ -36,6 +56,11 @@ public class Player extends Creature {
 		height=54;
 		bounds.width = width;
 		bounds.height = 39;
+		this.animation = new Animation(ANIMSPEED, Assets.playerAnim);
+		this.drill = new Drill();
+		
+		this.cargo = new ArrayList<Ore>();
+		this.setZ_index(15);
 		setHealth(getMaxHealth());
 	}
 
@@ -43,6 +68,7 @@ public class Player extends Creature {
 	public void tick() {
 		
 		super.tick();
+		this.animation.tick();
 		
 		// Movement
 		getInput();		
@@ -57,12 +83,12 @@ public class Player extends Creature {
 
 		resetMovement();
 
-		if (handler.getGame().getKeyManager().jetpack && getJetpackFuel() > 0){
+		if (handler.getGame().getKeyManager().jetpack && getFuel() > 0){
 				this.movement = this.movement.add(new Vector(0, -this.jetpackSpeed));
-				this.setJetpackFuel(this.getJetpackFuel() - this.jetpackCostPerTick);
+				this.setFuel(this.getFuel() - this.jetpackCostPerTick);
 				
-				if(this.getJetpackFuel() < 0)
-					this.setJetpackFuel(0);
+				if(this.getFuel() < 0)
+					this.setFuel(0);
 		}
 
 		if (handler.getGame().getKeyManager().right)
@@ -88,23 +114,34 @@ public class Player extends Creature {
 	
 	private void breakCell(int x, int y) {
 		Cell cell = handler.getWorld().getCell(x, y);
+		
+		/* si la cellule est vide, pas besoin de la casser */
 		if(cell instanceof EmptyCell) {
 			return;
 		}
 		
 		Point clickedCell = new Point(x, y);
 		Point playerCenter = new Point(this.position.getX() + this.width/2, this.position.getY() + this.height/2);
-		if (playerCenter.distanceTo(new Point(x * Cell.CELLHEIGHT, y * Cell.CELLWIDTH)) < this.playerRange) {
+		
+		double dist = playerCenter.distanceTo(new Point(x * Cell.CELLHEIGHT + Cell.CELLHEIGHT/2, y * Cell.CELLWIDTH + Cell.CELLWIDTH/2));
+		if (dist < this.playerRange) {
 			FrameTimerManager ftm = handler.getGame().getGameState().getFrameTimerManager();
 			if(clickedCell.equals(this.getBreaking())) { //same cell
 				FrameTimer breaking = ftm.getFrameTimer(FrameTimerManager.timer.BREAKING);			
-				if(!breaking.isRunning()) {
-					this.handler.getWorld().getCell(x, y).breakCell(x, y, this.handler);
+				if(!breaking.isRunning()) {					
+					
+					OreCell ore = handler.getWorld().getOreCell(x, y);
+					if(ore != null) {
+						ore.breakCell(x, y, this.handler);						
+					}
+					
+					this.handler.getWorld().breakCell(x, y);
+					
 					ftm.removeFrameTimer(FrameTimerManager.timer.BREAKING);
 					this.setBreaking(null);
 				}
 			} else { //new cell
-				ftm.add(FrameTimerManager.timer.BREAKING, true, cell.getResistance());
+				ftm.add(FrameTimerManager.timer.BREAKING, true, (long) (cell.getResistance() / this.miningSpeed));
 				this.setBreaking(clickedCell);
 			}
 		}
@@ -112,44 +149,70 @@ public class Player extends Creature {
 
 	@Override
 	public void render(Graphics g) {
-		renderPlayer(g);
+		int x = (int) (position.getX() - handler.getGame().getGameCamera().getxOffset());
+		int y = (int) (position.getY() - handler.getGame().getGameCamera().getyOffset());
+		MouseManager mm = handler.getGame().getMouseManager();
+		
+		BufferedImage frame = Assets.playerIDLE;		
+
+		facingLeft = mm.getMouseX() < x + this.width/2;
+		
+		if(movement.getX() != 0) {
+			frame = this.animation.getCurrentFrame();
+		}
+		
+		Point drillPos;
+		if (facingLeft) {
+			g.drawImage(frame, x  + width, y, -width, height, null);
+			drillPos = new Point(x + 10, y + height/2 + 20);
+		} else {
+			g.drawImage(frame, x, y, width, height, null);		
+			drillPos = new Point(x + width - 10, y + height/2 + 20);
+		}
+		
+		if(mm.getMouseY() < y)
+			drillPos.setY(y + 20);
+		
+		Double angle = drillPos.angleTo(handler.getGame().getMouseManager().getPosition());
+		
+		drill.render(g, (int) drillPos.getX(), (int) drillPos.getY(), angle);
+		
+		//uncomment to draw hitbox
+		//g.drawRect(x + bounds.x, y + bounds.y, this.bounds.width, this.bounds.height);
 	}	
 	
 	public void addFuel(float amount){
-		setJetpackFuel(getJetpackFuel() + amount);
-		if(getJetpackFuel() > getJetpackMaxFuel())
-			setJetpackFuel(getJetpackMaxFuel());
+		setFuel(getFuel() + amount);
+		if(getFuel() > getMaxFuel())
+			setFuel(getMaxFuel());
 	}
 	
-	public void addToCargo(int w){
-		if(this.getCargo() < this.getMaxcargo())
-			this.setCargo(this.getCargo() + w);
+	public boolean addToCargo(Ore ore){
+		if(this.getCargoSize() + ore.getWeight() < this.getMaxcargo()) {
+			this.setCargoSize(this.getCargoSize() + ore.getWeight());
+			this.cargo.add(ore);
+			return true;
+		}
+		return false;
 	}
 	
-	private void renderPlayer(Graphics g){
-		if(movement.getX() != 0)
-			facingLeft = movement.getX() < 0;
-		
-		int x = (int) (position.getX() - handler.getGame().getGameCamera().getxOffset());
-		int y = (int) (position.getY() - handler.getGame().getGameCamera().getyOffset());
-		
-		if (facingLeft) {
-			g.drawImage(Assets.player, x  + width, y, -width, height, null);
-		} else {
-			g.drawImage(Assets.player, x, y, width, height, null);		
+	public void sellCargo() {
+		for(int i = 0; i < this.cargo.size(); i++) {
+			this.money += this.cargo.get(i).getValue();
 		}
 		
-		//g.drawRect(x + bounds.x, y + bounds.y, this.bounds.width, this.bounds.height);
+		this.cargosize = 0;
+		this.cargo.clear();
 	}
-
+	
 	/* getters and setters */
 	
-	public float getCargo() {
-		return cargo;
+	public float getCargoSize() {
+		return cargosize;
 	}
 
-	public void setCargo(float cargo) {
-		this.cargo = cargo;
+	public void setCargoSize(float cargosize) {
+		this.cargosize = cargosize;
 	}
 
 	public float getMaxcargo() {
@@ -168,20 +231,27 @@ public class Player extends Creature {
 		this.maxHealth = maxHealth;
 	}
 
-	public float getJetpackFuel() {
-		return jetpackFuel;
+	public float getFuel() {
+		return fuel;
 	}
 
-	public void setJetpackFuel(float jetpackFuel) {
-		this.jetpackFuel = jetpackFuel;
+	public void setFuel(float fuel) {
+		if(fuel > this.maxfuel) {
+			this.fuel = this.maxfuel;
+		} else if(fuel < 0) {
+			this.fuel = 0;
+		} else {
+			this.fuel = fuel;
+		}
+			
 	}
 
-	public float getJetpackMaxFuel() {
-		return jetpackMaxFuel;
+	public float getMaxFuel() {
+		return maxfuel;
 	}
 
-	public void setJetpackMaxFuel(float jetpackMaxFuel) {
-		this.jetpackMaxFuel = jetpackMaxFuel;
+	public void setMaxFuel(float maxfuel) {
+		this.maxfuel = maxfuel;
 	}
 
 	public Point getBreaking() {
@@ -190,5 +260,13 @@ public class Player extends Creature {
 
 	public void setBreaking(Point breaking) {
 		this.breaking = breaking;
+	}
+
+	public int getMoney() {
+		return money;
+	}
+
+	public void setMoney(int money) {
+		this.money = money;
 	}
 }

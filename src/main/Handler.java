@@ -1,5 +1,6 @@
 package main;
 
+import entity.creature.Player;
 import map.GameWorld;
 
 public class Handler {
@@ -17,6 +18,10 @@ public class Handler {
 			instance = new Handler(game);
 			
 		return instance;
+	}
+	
+	public Player getPlayer() {
+		return game.getEntityManager().getPlayer();
 	}
 	
 	public static Handler getInstance() {

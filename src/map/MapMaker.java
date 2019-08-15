@@ -4,6 +4,7 @@ import org.j3d.texture.procedural.PerlinNoiseGenerator;
 
 import terrain.Cell;
 import terrain.liquid.LavaCell;
+import terrain.ore.OreCell;
 
 public class MapMaker {
 	
@@ -26,23 +27,37 @@ public class MapMaker {
 		for (int y = surfaceHeight; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				if (cv.getCellmap()[x][y - surfaceHeight]) {
-					this.gameWorld.setCell(x, y, Cell.bedrockCell);
+					this.gameWorld.setCell(x, y, Cell.obsidian);
 				} else {
-					this.gameWorld.setCell(x, y, Cell.emptyCell);
+					this.gameWorld.setCell(x, y, Cell.empty);
 				}
 			}
 		}
 		
-		addSurfaceLayer(Cell.grassCell);
+		addSurfaceLayer(Cell.grass);
 
-		highestPoint = getHighestPoint(Cell.grassCell);
-
+		highestPoint = getHighestPoint(Cell.grass);
+		
+		Cavegen goldGen = new Cavegen(width, height, 0.17f, 4, 1, 2);
+		Cavegen plutGen = new Cavegen(100, 100, 0.10f, 2, 5, 6);
+		
+		for(int i = 0; i < width; i++) {
+			for(int j = 0; j < height; j++) {
+				if(this.gameWorld.getCell(i, j) != Cell.empty) {
+					if(goldGen.getCellmap()[i][j])
+						this.gameWorld.setOreCell(i, j, Cell.gold);
+					if(plutGen.getCellmap()[i][j])
+						this.gameWorld.setOreCell(i, j, Cell.plutonium);
+				}
+			}
+		}
+		
 		// Adding layers
-		addLayer(0, height - 7, Cell.stoneCell, Cell.goldCell, 5);
-		addLayer(0, height - 20, Cell.cobbleCell, Cell.goldCell, 5);
-		addLayer(0, height - 40, Cell.gravelCell, Cell.goldCell, 5);
-		addLayer(0, height - 60, Cell.dirtCell, Cell.goldCell, 5);
-		addLayer(0, highestPoint + 15, Cell.sandCell, Cell.goldCell, 10);
+		addLayer(0, height - 7, Cell.obsidian, 5);
+		addLayer(0, height - 20, Cell.gravel, 5);
+		addLayer(0, height - 40, Cell.marble, 5);
+		addLayer(0, height - 60, Cell.stone, 5);
+		addLayer(0, highestPoint + 15, Cell.dirt, 10);
 
 		addLavaToBottom(height - 10);
 	
@@ -66,11 +81,11 @@ public class MapMaker {
 		for (int x = 0; x < width; x++) {
 			float noise = pnl.noise1(((float) x) / zoom);
 			int y = (int) (((noise + 1) / 2) * amplitude);
-			if(this.gameWorld.getCell(x,y) != Cell.emptyCell)
+			if(this.gameWorld.getCell(x,y) != Cell.empty)
 				this.gameWorld.setCell(x, y, cell);
 			
 			for(int j = y-1; j >= 0; j--)
-				this.gameWorld.setCell(x, j, Cell.emptyCell);
+				this.gameWorld.setCell(x, j, Cell.empty);
 		}
 	}
 	
@@ -87,7 +102,7 @@ public class MapMaker {
 	private void addLavaToBottom(int yStart) {
 		for (int y = yStart; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				if (this.gameWorld.getCell(x, y) == Cell.emptyCell)
+				if (this.gameWorld.getCell(x, y) == Cell.empty)
 					new LavaCell(x,y);
 			}			
 		}
@@ -101,7 +116,7 @@ public class MapMaker {
 		}
 
 		for (int y = yStart; y < yStart + size; y++) {
-			if (this.gameWorld.getCell(x, y) != Cell.emptyCell & this.gameWorld.getCell(x, y) != Cell.grassCell) {
+			if (this.gameWorld.getCell(x, y) != Cell.empty & this.gameWorld.getCell(x, y) != Cell.grass) {
 				if (Math.random() < progressionPercentage[y - yStart]) {
 					this.gameWorld.setCell(x, y, cell);					
 				}
@@ -119,22 +134,16 @@ public class MapMaker {
 	 * @param transitionSize Number of lines the transitions will take (included in
 	 *                       the layer)
 	 */
-	private void addLayer(int y1, int y2, Cell cell, Cell oreCell, int transitionSize) {
-
-		System.out.println(y2 + "," + y1);
-		Cavegen orelode = new Cavegen(width, y2 - y1, 0.17f, 4, 1, 2);
-
+	private void addLayer(int y1, int y2, Cell cell, int transitionSize) {
 		for (int x = 0; x < width; x++) {
-			int yOffset = getFirstCellOccurence(x, Cell.grassCell) - highestPoint;
+			int yOffset = getFirstCellOccurence(x, Cell.grass) - highestPoint;
 
 			int yMaxLoop = y2 - transitionSize + yOffset;
 
 			for (int y = y1 + yOffset; y < yMaxLoop; y++) {
 				if (y < height) {
-					if (this.gameWorld.getCell(x, y) != Cell.emptyCell & this.gameWorld.getCell(x, y) != Cell.grassCell) {
-						if (orelode.getCellmap()[x][y - (y1 + yOffset)])
-							this.gameWorld.setCell(x, y,oreCell);
-						else
+					Cell ccell = this.gameWorld.getCell(x, y);
+					if (ccell != Cell.empty && ccell != Cell.grass) {						
 							this.gameWorld.setCell(x, y,cell);
 					}
 				}

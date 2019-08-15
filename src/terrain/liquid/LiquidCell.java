@@ -56,10 +56,10 @@ public abstract class LiquidCell extends EmptyCell {
 		/**************************/
 
 		/* si la cellule du bas est vide, tout le liquide y coule */
-		if (map.getCell(x, y + 1) == Cell.emptyCell) {
+		if (map.getCell(x, y + 1) == Cell.empty) {
 			LavaCell newCell = new LavaCell(x, y + 1);
 			newCell.level = this.level;
-			map.setCell(x, y, Cell.emptyCell);
+			map.setCell(x, y, Cell.empty);
 		}
 
 		/*
@@ -77,7 +77,7 @@ public abstract class LiquidCell extends EmptyCell {
 				this.level = (byte) (sum - Byte.MAX_VALUE);
 			} else {
 				downCell.level = (byte) sum;
-				map.setCell(x, y, Cell.emptyCell);
+				map.setCell(x, y, Cell.empty);
 			}
 		}
 
@@ -100,7 +100,7 @@ public abstract class LiquidCell extends EmptyCell {
 			boolean canFlowRight = rightLiquid != null &&rightLiquid.level != Byte.MAX_VALUE && rightLiquid.level < this.level;
 
 			/* si les deux cellules adjacentes sont des cellules liquides */
-			if (canFlowRight && canFlowLeft || canFlowRight && leftCell == Cell.emptyCell || rightCell == Cell.emptyCell && canFlowLeft || rightCell == leftCell && leftCell == Cell.emptyCell) {				
+			if (canFlowRight && canFlowLeft || canFlowRight && leftCell == Cell.empty || rightCell == Cell.empty && canFlowLeft || rightCell == leftCell && leftCell == Cell.empty) {				
 				
 				//crée des cellules de lave si besoin
 				if(leftLiquid == null) {
@@ -129,7 +129,7 @@ public abstract class LiquidCell extends EmptyCell {
 			/*****************************/
 
 			/* si la cellule a gauche est vide le liquide y coule de moitié */
-			else if (this.level > 1 && leftCell == Cell.emptyCell) {
+			else if (this.level > 1 && leftCell == Cell.empty) {
 				LavaCell newCell = new LavaCell(x - 1, y);
 				int oldlevel = this.level;
 				newCell.level = (byte) (this.level / 2);
@@ -154,7 +154,7 @@ public abstract class LiquidCell extends EmptyCell {
 			/*****************************/
 
 			/* si la cellule a droite est vide le liquide y coule de moitié */
-			else if (this.level > 1 && map.getCell(x + 1, y) == Cell.emptyCell) {
+			else if (this.level > 1 && map.getCell(x + 1, y) == Cell.empty) {
 				LavaCell newCell = new LavaCell(x + 1, y);
 				int oldlevel = this.level;
 				newCell.level = (byte) (this.level / 2);

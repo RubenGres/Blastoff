@@ -54,4 +54,8 @@ public class Point {
 		return "[" + x + "," + y + "]";
 	}
 
+	public Double angleTo(Point p) {
+		return Math.atan2(p.y - this.y, p.x - this.x);
+	}
+
 }

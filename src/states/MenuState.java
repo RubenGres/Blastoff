@@ -98,17 +98,6 @@ public class MenuState extends State {
 		}
 
 		public void getInput() {
-			int selection = 0;
-
-			if (handler.getGame().getKeyManager().down) {
-				selection = 1;
-			} else if (handler.getGame().getKeyManager().up) {
-				selection = -1;
-			}
-
-			this.changeSelection(selection);
-
-			selecting = handler.getGame().getKeyManager().select;
 		}
 
 		public void changeSelection(int deplacement) {

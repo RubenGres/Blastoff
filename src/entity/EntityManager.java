@@ -4,12 +4,10 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 
 import entity.creature.Player;
 import main.Handler;
 import physics.Vector;
-import terrain.Cell;
 
 public class EntityManager {
 	
@@ -23,7 +21,7 @@ public class EntityManager {
 	private Comparator<Entity> renderSorter = new Comparator<Entity>(){
 		@Override
 		public int compare(Entity a, Entity b) {
-			if(a.position.getX() + a.getHeight() < b.position.getY() + b.getHeight())
+			if(a.getZ_index() < b.getZ_index())
 				return -1;
 			return 1;
 		}

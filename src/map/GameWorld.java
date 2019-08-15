@@ -7,19 +7,25 @@ import states.State;
 import terrain.Cell;
 import terrain.liquid.LavaCell;
 import terrain.liquid.LiquidCell;
+import terrain.ore.OreCell;
 import utils.FrameTimerManager;
 
 public class GameWorld {
 
 	public int height, width;
-	private Cell[][] map;
+	
+	private Cell[][] cellMap;
+	private OreCell[][] oreMap;
+	private LiquidCell[][] liquidMap;
+	
 	private Handler handler;
 
 	public GameWorld(int width, int height) {
 		this.height = height;
 		this.width = width;
 		this.handler = Handler.getInstance();
-		this.map = new Cell[width][height];
+		this.cellMap = new Cell[width][height];
+		this.oreMap = new OreCell[width][height];
 	}
 	
 	public void init() {		
@@ -49,8 +55,10 @@ public class GameWorld {
 	
 
 	public void breakCell(int x, int y) {
-		if (!(this.getCell(x, y) instanceof LiquidCell))
-			map[x][y] = Cell.emptyCell;
+		if (!(this.getCell(x, y) instanceof LiquidCell)) {
+			cellMap[x][y] = Cell.empty;
+			oreMap[x][y] = null;
+		}
 	}
 
 	public void render(Graphics g) {
@@ -63,7 +71,7 @@ public class GameWorld {
 
 		for (int y = yStart; y < yEnd; y++) {
 			for (int x = xStart; x < xEnd; x++) {
-				this.map[x][y].render(g, (int) (x * Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset()),
+				this.cellMap[x][y].render(g, (int) (x * Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset()),
 						(int) (y * Cell.CELLHEIGHT - handler.getGame().getGameCamera().getyOffset()), x, y);
 			}
 		}
@@ -71,19 +79,27 @@ public class GameWorld {
 
 	public Cell getCell(int x, int y) {
 		try {
-			return this.map[x][y];
+			return this.cellMap[x][y];
 		} catch (Exception e) {
 			//e.printStackTrace();
-			return Cell.emptyCell;
+			return Cell.empty;
 		}
 	}
 	
 	public void setCell(int x, int y, Cell cell) {
 		try {
-			map[x][y] = cell;
+			cellMap[x][y] = cell;
 		} catch (Exception e) {
 			//e.printStackTrace();
 		}
+	}
+	
+	public OreCell getOreCell(int x, int y) {
+		return this.oreMap[x][y];
+	}
+	
+	public void setOreCell(int x, int y, OreCell cell) {
+		oreMap[x][y] = cell;
 	}
 
 	// GETTERS AND SETTERS

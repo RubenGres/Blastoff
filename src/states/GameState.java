@@ -5,7 +5,9 @@ import java.awt.Graphics;
 
 import entity.EntityManager;
 import entity.creature.Player;
-import entity.pickable.FuelTank;
+import entity.machine.FuelMachine;
+import entity.machine.OreMachine;
+import entity.pickable.PlutoniumOre;
 import entity.pickable.GoldOre;
 import gfx.Assets;
 import gfx.GameCamera;
@@ -17,7 +19,7 @@ import physics.Point;
 public class GameState extends State {
 	
 	//game world
-	private static int worldWidth = 300, worldHeight = 100;
+	private static int worldWidth = 100, worldHeight = 100;
 	private GameWorld map;
 	
 	//Camera
@@ -39,8 +41,10 @@ public class GameState extends State {
 
 		gameCamera = new GameCamera();
 		
-   		em.addEntity(new FuelTank(220, 10));
-   		em.addEntity(new GoldOre(300, 10));
+		em.addEntity(new OreMachine(300, 20));
+		em.addEntity(new FuelMachine(500, 20));
+		for(int i = 0; i < 100; i++)
+			em.addEntity(new GoldOre(220, 10));
    		
 	}
 
@@ -60,12 +64,13 @@ public class GameState extends State {
 		int screenW = handler.getGame().getWidth();
 		int screenH = handler.getGame().getHeight();
 		
-		g.drawImage(Assets.bkg, 0, 0, screenW, screenH, null);
+		Assets.bkg.render(g);
 		map.render(g);
 		
+		GameInterface.showBreakingCell(g);
 		em.render(g);
 		
-		GameInterface.render(g);		
+		GameInterface.render(g);	
 	}
 	
 	public GameWorld getMap(){

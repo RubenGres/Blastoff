@@ -23,6 +23,11 @@ public class Cavegen {
 		this.cellmap = new boolean[width][height];
 		generateMap();
 	}
+	
+	public static void main(String[] args) {
+		Cavegen plutGen = new Cavegen(100, 100, 0.10f, 2, 5, 6);
+		plutGen.show();
+	}
 
 	private void generateMap() {
 		// Set up the map with random values
@@ -49,7 +54,7 @@ public class Cavegen {
 				// In case the index we're looking at it off the edge of the map
 				else if (neighbour_x < 0 || neighbour_y < 0 || neighbour_x >= cellmap.length
 						|| neighbour_y >= cellmap[0].length) {
-					count += 1;
+					//count += 1;
 				}
 				// Otherwise, a normal check of the neighbour
 				else if (cellmap[neighbour_x][neighbour_y]) {

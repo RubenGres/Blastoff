@@ -4,6 +4,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import physics.Point;
+
 public class MouseManager implements MouseListener, MouseMotionListener{
 
 	private boolean leftPressed, rightPressed;
@@ -36,8 +38,8 @@ public class MouseManager implements MouseListener, MouseMotionListener{
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		mouseX = e.getX();
+		mouseY = e.getY();		
 	}
 
 	@Override
@@ -54,8 +56,6 @@ public class MouseManager implements MouseListener, MouseMotionListener{
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class MouseManager implements MouseListener, MouseMotionListener{
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {		
+	public void mousePressed(MouseEvent e) {
 		if(e.getButton() == MouseEvent.BUTTON1)
 			leftPressed = true;
 		if(e.getButton() == MouseEvent.BUTTON3)
@@ -78,6 +78,10 @@ public class MouseManager implements MouseListener, MouseMotionListener{
 			leftPressed = false;
 		if(e.getButton() == MouseEvent.BUTTON3)
 			rightPressed = false;		
+	}
+
+	public Point getPosition() {
+		return new Point(this.mouseX, this.mouseY);
 	}
 
 }

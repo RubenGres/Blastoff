@@ -2,6 +2,9 @@ package gfx;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+
+import org.lwjgl.util.Rectangle;
 
 import entity.creature.Player;
 import main.Handler;
@@ -12,14 +15,30 @@ import utils.FrameTimerManager;
 
 public class GameInterface {
 	
+	private static final int BARHEIGHT = 115;
+	private static final int BARWIDTH = 40;
+	
 	public static void render(Graphics g) {
-		showBreakingCell(g);
 		renderHalo(g, 3000);
 		
+		g.setColor(Color.GRAY);
+		g.fillRect(5, 5, 250, 125);
 		renderGuiBars(g, 10, 10);
+		renderMoney(g, 150, 30);
 	}
 	
-	private static void showBreakingCell(Graphics g) {
+	private static void renderMoney(Graphics g, int x, int y) {
+		Handler handler = Handler.getInstance();
+		Player player = handler.getGame().getEntityManager().getPlayer();
+		
+		g.setFont(Assets.font_ka1);
+		g.setColor(Color.WHITE);
+		g.fillRect(x, y - 13, 100, 17);
+		g.setColor(Color.BLACK);
+		g.drawString(player.getMoney() + " G", x, y);
+	}
+
+	public static void showBreakingCell(Graphics g) {
 		Handler handler = Handler.getInstance();
 		FrameTimerManager ftm = handler.getGame().getGameState().getFrameTimerManager();
 		Player player = handler.getGame().getEntityManager().getPlayer();
@@ -58,24 +77,46 @@ public class GameInterface {
 		Handler handler = Handler.getInstance();
 		Player player = handler.getGame().getEntityManager().getPlayer();
 		
-		renderBar(g, x, y, "FUEL", Color.GREEN, player.getJetpackFuel(), player.getJetpackMaxFuel());
-		renderBar(g, x + 60, y, "LIFE", Color.RED, player.getHealth(), player.getMaxHealth());
-		renderBar(g, x + 120, y, "CARGO", Color.CYAN, player.getCargo(), player.getMaxcargo());
+		int dx = x;
+		renderBar(g, dx, y, "FUEL", Assets.fuelbar, player.getFuel(), player.getMaxFuel());
+		dx += BARWIDTH + 5;
+		renderBar(g, dx, y, "LIFE", Assets.healthbar, player.getHealth(), player.getMaxHealth());
+		dx += BARWIDTH + 5;
+		renderBar(g, dx, y, "CARGO", Color.CYAN, player.getCargoSize(), player.getMaxcargo());
 	}
 	
-	private static void renderBar(Graphics g, int x, int y, String name, Color c, float current, float max){
-		int height = 150;
-		int width = 50;
-		
-		g.drawImage(Assets.guibarbg, x, y, width, height, null);
+	private static void renderBar(Graphics g, int x, int y, String name, Color c, float current, float max){		
+		g.drawImage(Assets.guibarbg, x, y, BARWIDTH, BARHEIGHT, null);
 		
 		g.setColor(c);
-		g.fillRect(x, height + y, width, -(int) ((current/max) * height));
+		g.fillRect(x, BARHEIGHT + y, BARWIDTH, -(int) ((current/max) * BARHEIGHT));
 		
-		g.drawImage(Assets.guibar, x, y, width, height, null);
-		
-		g.setColor(Color.BLACK);
-		g.drawString(name, x + 10, y + 20);
+		g.drawImage(Assets.guibar, x, y, BARWIDTH, BARHEIGHT, null);
 	}
+	
+	private static void renderBar(Graphics g, int x, int y, String name, BufferedImage i, float current, float max){		
+		g.drawImage(Assets.guibarbg, x, y, BARWIDTH, BARHEIGHT, null);
+		
+		float pctFilled = (current/max);
+		if(pctFilled > 0) {
+			int barH = (int) (pctFilled * BARHEIGHT);
+			int yP = y + BARHEIGHT - barH;
+			
+			BufferedImage iCropped = i.getSubimage(0, (int) (i.getHeight()*(1 - pctFilled)), i.getWidth(), (int) (i.getHeight() * pctFilled));
+			g.drawImage(iCropped, x, yP, BARWIDTH, barH, null);	
+		}		
+		
+		g.drawImage(Assets.guibar, x, y, BARWIDTH, BARHEIGHT, null);
+	}
+	
+
+	private static BufferedImage crop(BufferedImage src, Rectangle rect) {
+	    BufferedImage dest = new BufferedImage(rect.getWidth(), rect.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+	    Graphics g = dest.getGraphics();
+	    g.drawImage(src, 0, 0, rect.getWidth(), rect.getHeight(), rect.getX(), rect.getY(), rect.getX() + rect.getWidth(), rect.getY() + rect.getHeight(), null);
+	    g.dispose();
+	    return dest;
+	}
+
 
 }

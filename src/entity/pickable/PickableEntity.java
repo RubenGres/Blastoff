@@ -1,13 +1,10 @@
 package entity.pickable;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import entity.Entity;
 import entity.EntityManager;
-import gfx.Assets;
-import main.Handler;
 
 public abstract class PickableEntity extends Entity{
 	
@@ -20,7 +17,7 @@ public abstract class PickableEntity extends Entity{
 
 	@Override
 	public void tick() {
-		if(EntityManager.checkCollision(handler.getGame().getEntityManager().getPlayer(), this)){
+		if(EntityManager.checkCollision(handler.getPlayer(), this)){
 			onCollision();
 		}
 	}

@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 import display.Display;
 import entity.EntityManager;
 import entity.creature.Player;
-import entity.pickable.FuelTank;
+import entity.pickable.PlutoniumOre;
 import gfx.GameCamera;
 import input.KeyManager;
 import input.MouseManager;

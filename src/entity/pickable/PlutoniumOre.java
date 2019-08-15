@@ -1,13 +1,13 @@
 package entity.pickable;
 import gfx.Assets;
-import main.Handler;
 
-public class FuelTank extends PickableEntity{
+public class PlutoniumOre extends Ore{
 
-	private int capacity = 20;
+	private int capacity;
 	
-	public FuelTank(float x, float y) {
-		super(x, y, 30, 40, Assets.fueltank);
+	public PlutoniumOre(float x, float y) {
+		super(x, y, 30, 40, Assets.plutoniumore);
+		this.capacity = 20;
 	}
 
 	@Override
