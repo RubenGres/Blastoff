@@ -1,5 +1,6 @@
 package entity.creature;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -9,7 +10,9 @@ import drill.Drill;
 import entity.pickable.Ore;
 import gfx.Animation;
 import gfx.Assets;
+import gfx.GameCamera;
 import input.MouseManager;
+import main.Handler;
 import physics.Point;
 import physics.Vector;
 import terrain.Cell;
@@ -26,8 +29,8 @@ public class Player extends Creature {
 	private float fuel = getMaxFuel();
 	private float jetpackCostPerTick = 0.2f;
 	
-	private int playerRange = 75;
-
+	private int playerRange = 75;	
+	
 	/* mining */
 	private float miningSpeed = 1;
 	private Point breaking = null;
@@ -65,17 +68,33 @@ public class Player extends Creature {
 	}
 
 	@Override
-	public void tick() {
-		
+	public void tick() {		
 		super.tick();
 		this.animation.tick();
 		
 		// Movement
 		getInput();		
 		move(movement);
+		
+		// TODO move in drill
+		int x = (int) position.getX();
+		int y = (int) position.getY();
+		Point drillPos;
+		if (facingLeft) {
+			drillPos = new Point(x + 10, y + height/2 + 20);
+		} else {	
+			drillPos = new Point(x + width - 10, y + height/2 + 20);
+		}
+		
+		GameCamera gc = handler.getGame().getGameCamera();
+		Point drillDispPos = new Point(drillPos.getX() - gc.getxOffset(), drillPos.getY() - gc.getyOffset());
+		float angle = drillDispPos.angleTo(handler.getGame().getMouseManager().getPosition());
+
+		if(angle < -Math.PI/4 && angle > -3*Math.PI/4)
+			drillPos.setY(y + 20);
+		this.drill.tick((int) drillPos.getX(), (int) drillPos.getY(), angle);
 
 		handler.getGame().getGameCamera().centerOnEntity(this);
-
 	}
 
 	private void getInput() {
@@ -100,15 +119,43 @@ public class Player extends Creature {
 		this.movement = this.movement.normalize().multiply(speed);
 		
 		/* casse une cellule */
+		Point fCell = getFocusedCell();
 		if (mm.isLeftPressed()) {
-			float xOffset = this.handler.getGame().getGameCamera().getxOffset();
-			float yOffset = this.handler.getGame().getGameCamera().getyOffset();
-			int x = (int) (mm.getMouseX() + xOffset);
-			int y = (int) (mm.getMouseY() + yOffset);
-			breakCell(x/Cell.CELLWIDTH, y/Cell.CELLHEIGHT);
+			if(fCell != null) {
+				breakCell((int) fCell.getX(),(int) fCell.getY());				
+			}
 		} else {
 			handler.getGame().getGameState().getFrameTimerManager().removeFrameTimer(FrameTimerManager.timer.BREAKING);
 			this.setBreaking(null);
+		}
+	}
+	
+	private Point getFocusedCell() {		
+		float a = this.drill.getAngle();
+		int step = Cell.CELLWIDTH;
+		
+		double vX = Math.cos(a) * step;
+		double vY = Math.sin(a) * step;
+		
+		int n = 0;
+		int x = this.drill.getX();
+		int y = this.drill.getY();		
+		Cell c;
+		do {
+			x += vX;
+			y += vY;
+			c = handler.getWorld().getCell(x/Cell.CELLWIDTH, y/Cell.CELLHEIGHT);
+			n ++;
+		}while(n*step < this.playerRange && c instanceof EmptyCell);
+				
+		GameCamera gc = handler.getGame().getGameCamera();
+		this.a = (int) (x - gc.getxOffset());
+		this.b = (int) (y - gc.getyOffset());
+		
+		if(n*step < this.playerRange) {
+			return new Point(x/Cell.CELLWIDTH, y/Cell.CELLHEIGHT);			
+		} else {
+			return null;
 		}
 	}
 	
@@ -147,6 +194,7 @@ public class Player extends Creature {
 		}
 	}
 
+	int a, b;
 	@Override
 	public void render(Graphics g) {
 		int x = (int) (position.getX() - handler.getGame().getGameCamera().getxOffset());
@@ -161,24 +209,16 @@ public class Player extends Creature {
 			frame = this.animation.getCurrentFrame();
 		}
 		
-		Point drillPos;
 		if (facingLeft) {
 			g.drawImage(frame, x  + width, y, -width, height, null);
-			drillPos = new Point(x + 10, y + height/2 + 20);
 		} else {
-			g.drawImage(frame, x, y, width, height, null);		
-			drillPos = new Point(x + width - 10, y + height/2 + 20);
+			g.drawImage(frame, x, y, width, height, null);
 		}
 		
-		if(mm.getMouseY() < y)
-			drillPos.setY(y + 20);
+		drill.render(g);
 		
-		Double angle = drillPos.angleTo(handler.getGame().getMouseManager().getPosition());
-		
-		drill.render(g, (int) drillPos.getX(), (int) drillPos.getY(), angle);
-		
-		//uncomment to draw hitbox
-		//g.drawRect(x + bounds.x, y + bounds.y, this.bounds.width, this.bounds.height);
+		g.setColor(Color.RED);
+		g.fillOval(a, b, 10, 10);
 	}	
 	
 	public void addFuel(float amount){

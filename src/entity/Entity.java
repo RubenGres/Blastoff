@@ -9,6 +9,8 @@ import terrain.Cell;
 import main.Handler;
 
 public abstract class Entity {
+	
+	private final static boolean SHOW_HITBOX = true;
 
 	protected Handler handler;
 
@@ -38,6 +40,12 @@ public abstract class Entity {
 	public abstract void tick();
 
 	public abstract void render(Graphics g);
+	
+	public void showHitbox(Graphics g) {
+		int x = (int) (position.getX() - handler.getGame().getGameCamera().getxOffset());
+		int y = (int) (position.getY() - handler.getGame().getGameCamera().getyOffset());
+		g.drawRect(x + bounds.x, y + bounds.y, this.bounds.width, this.bounds.height);
+	}
 
 	protected void renderHitbox(Graphics g) {
 		g.setColor(Color.RED);
@@ -91,8 +99,7 @@ public abstract class Entity {
 			}
 		}
 		return pos;
-	}
-	
+	}	
 
 
 	public Point getPosition() {

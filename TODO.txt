@@ -1,5 +1,1 @@
-minerais
-tilesheet
-changing background picture
 menu
-block resistance
