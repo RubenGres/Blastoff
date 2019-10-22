@@ -17,7 +17,7 @@ public abstract class PickableEntity extends Entity{
 
 	@Override
 	public void tick() {
-		if(EntityManager.checkCollision(handler.getPlayer(), this)){
+		if(EntityManager.checkCollision(handler.getUserPlayer(), this)){
 			onCollision();
 		}
 	}

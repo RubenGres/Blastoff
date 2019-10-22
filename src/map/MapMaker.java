@@ -69,7 +69,6 @@ public class MapMaker {
 		int death = 2; // Dies if less than x neighbors
 		int iteration = 3; // Number of iterations
 		Cavegen cv = new Cavegen(width, height - surfaceHeight, percentFilled, birth, death, iteration);
-		cv.show();
 		return cv;
 	}
 

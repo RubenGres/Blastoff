@@ -22,18 +22,13 @@ import states.State;
 
 public class Game implements Runnable {
 
-	private Display display;
-	public int width = 1000, height = 700;
-	public String title;
-
-	// game thread
-	private boolean running = false;
-	private Thread thread;
-	private int FPS = 60;
-
-	// rendering
-	private BufferStrategy bs;
-	private Graphics g;
+	// game threads
+	public static boolean running = false;
+	public static int FPS = 60;
+	public static String title;
+	
+	private Thread tick_thread;
+	private RenderThread render_thread;
 
 	// handler
 	private KeyManager keyManager;
@@ -44,21 +39,13 @@ public class Game implements Runnable {
 	public MenuState menuState;
 
 	public Game(String title, int width, int height) {
-		this.title = title;
+		Game.title = title;
 
 		keyManager = new KeyManager();
 		mouseManager = new MouseManager();		
 	}
 
 	private void init() {
-		display = new Display(title, width, height);
-		display.getFrame().addKeyListener(keyManager);
-
-		display.getFrame().addMouseListener(mouseManager);
-		display.getFrame().addMouseMotionListener(mouseManager);
-		display.getCanvas().addMouseListener(mouseManager);
-		display.getCanvas().addMouseMotionListener(mouseManager);
-
 		Handler.getInstance(this);
 		
 		this.gameState = new GameState();
@@ -69,88 +56,43 @@ public class Game implements Runnable {
 		gameState.init();
 	}
 
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public GameWorld getMap() {
-		return gameState.getMap();
-	}
-
-	private void tick() {
-		this.width = display.getFrame().getWidth();
-		this.height = display.getFrame().getHeight();
-		
+	private void tick() {		
 		keyManager.tick();
 
 		if (State.getState() != null)
 			State.getState().tick();
 	}
 
-	private void render() {
-		bs = display.getCanvas().getBufferStrategy();
-		if (bs == null) {
-			display.getCanvas().createBufferStrategy(3);
-			return;
-		}
-		g = bs.getDrawGraphics();
-		
-		// Clear Screen
-		g.clearRect(0, 0, width, height);
-		// Draw Here!
-
-		if (State.getState() != null)
-			State.getState().render(g);
-
-		// End Drawing!
-		bs.show();
-		g.dispose();
-	}
-
 	public void run() {
-
 		init();
 		double timePerTick = 1000000000 / FPS;
 		double delta = 0;
 		long now;
 		long lastTime = System.nanoTime();
-		long timer = 0;
-		int ticks = 0;
 
 		while (running) {
 			now = System.nanoTime();
 			delta += (now - lastTime) / timePerTick;
-			timer += now - lastTime;
 			lastTime = now;
 
 			if (delta >= 1) {
 				tick();
-				render();
-				ticks++;
 				delta--;
-			}
-
-			if (timer >= 1000000000) {
-				System.out.println("FPS : " + ticks);
-				ticks = 0;
-				timer = 0;
-			}
+			}			
 		}
 
 		stop();
-
 	}
 
 	public synchronized void start() {
 		if (running)
 			return;
 		running = true;
-		thread = new Thread(this);
-		thread.start();
+		tick_thread = new Thread(this);
+		tick_thread.start();
+		
+		render_thread = new RenderThread(keyManager, mouseManager);
+		render_thread.start();
 	}
 
 	public synchronized void stop() {
@@ -158,7 +100,8 @@ public class Game implements Runnable {
 			return;
 		running = false;
 		try {
-			thread.join();
+			tick_thread.join();
+			render_thread.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -186,6 +129,18 @@ public class Game implements Runnable {
 
 	public MenuState getMenuState() {
 		return menuState;
+	}
+
+	public int getWidth() {
+		return render_thread.getWidth();
+	}
+
+	public int getHeight() {
+		return render_thread.getHeight();
+	}
+
+	public GameWorld getMap() {
+		return gameState.getMap();
 	}
 
 }

@@ -45,7 +45,7 @@ public class Background {
 		tick();
 		
 		Handler handler = Handler.getInstance();
-		int h = handler.getGame().height;
+		int h = handler.getGame().getHeight();
 		int w = (int) (this.width * (1.0 * h/this.height));
 		this.dw = w;
 		

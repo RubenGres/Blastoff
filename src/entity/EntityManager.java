@@ -6,13 +6,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import entity.creature.Player;
+import entity.creature.UserPlayer;
 import main.Handler;
 import physics.Vector;
 
 public class EntityManager {
 	
 	private Handler handler;
-	private Player player;
+	private UserPlayer player;
 	
 	private ArrayList<Entity> entities;
 	private ArrayList<Entity> toRemove = new ArrayList<>();
@@ -27,7 +28,7 @@ public class EntityManager {
 		}
 	};
 	
-	public EntityManager(Player player){
+	public EntityManager(UserPlayer player){
 		this.handler = Handler.getInstance();
 		this.player = player;
 		entities = new ArrayList<Entity>();
@@ -57,7 +58,7 @@ public class EntityManager {
 		entities.sort(renderSorter);
 	}
 
-	public void render(Graphics g){
+	public synchronized void render(Graphics g){
 		for(Entity e : entities){
 			e.render(g);
 		}
@@ -82,7 +83,7 @@ public class EntityManager {
 		this.handler = handler;
 	}
 
-	public Player getPlayer() {
+	public UserPlayer getUserPlayer() {
 		return player;
 	}
 

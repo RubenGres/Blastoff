@@ -13,7 +13,7 @@ public abstract class Ore extends PickableEntity{
 
 	@Override
 	public void onCollision() {
-		if(handler.getGame().getEntityManager().getPlayer().addToCargo(this))
+		if(handler.getGame().getEntityManager().getUserPlayer().addToCargo(this))
 			handler.getGame().getEntityManager().removeEntity(this);		
 	}
 	

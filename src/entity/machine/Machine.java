@@ -19,7 +19,7 @@ public abstract class Machine extends Entity {
 	@Override
 	public void tick() {
 		arrow = false;
-		if (EntityManager.checkCollision(handler.getPlayer(), this)) {
+		if (EntityManager.checkCollision(handler.getUserPlayer(), this)) {
 			arrow = true;
 			onCollision();
 		}

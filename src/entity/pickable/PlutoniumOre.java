@@ -12,7 +12,7 @@ public class PlutoniumOre extends Ore{
 
 	@Override
 	public void onCollision() {
-		handler.getGame().getEntityManager().getPlayer().addFuel(capacity);
+		handler.getGame().getEntityManager().getUserPlayer().addFuel(capacity);
 		handler.getGame().getEntityManager().removeEntity(this);
 	}	
 }

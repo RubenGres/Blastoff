@@ -42,7 +42,8 @@ public class Assets {
 	
 	/* machines */
 	public static  BufferedImage ore_machine = loadTexture("res/textures/machines/ore.png"),
-			fuel_machine = loadTexture("res/textures/machines/fuel.png");
+			fuel_machine = loadTexture("res/textures/machines/fuel.png"),
+			shop_machine = loadTexture("res/textures/machines/shop.png");
 	
 	/* textures */
 	public static  BufferedImage gradient = loadTexture("res/textures/gradient.png"),

@@ -5,8 +5,10 @@ import java.awt.Graphics;
 
 import entity.EntityManager;
 import entity.creature.Player;
+import entity.creature.UserPlayer;
 import entity.machine.FuelMachine;
 import entity.machine.OreMachine;
+import entity.machine.ShopMachine;
 import entity.pickable.PlutoniumOre;
 import entity.pickable.GoldOre;
 import gfx.Assets;
@@ -34,18 +36,18 @@ public class GameState extends State {
 	}
 	
 	public void init(){
-		this.map = new GameWorld(worldWidth, worldHeight);
+		this.map = new GameWorld();
 		this.map.init();
 		
-		this.em = new EntityManager(new Player(0, 0));
-
+		this.em = new EntityManager(new UserPlayer(0, 0));
+		
 		gameCamera = new GameCamera();
 		
 		em.addEntity(new OreMachine(300, 20));
+		em.addEntity(new ShopMachine(400, 20));
 		em.addEntity(new FuelMachine(500, 20));
 		for(int i = 0; i < 100; i++)
-			em.addEntity(new GoldOre(220, 10));
-   		
+			em.addEntity(new GoldOre(220, 10));   		
 	}
 
 	public EntityManager getEntityManager() {
@@ -60,14 +62,12 @@ public class GameState extends State {
 	}
 
 	@Override
-	public void render(Graphics g) {
-		int screenW = handler.getGame().getWidth();
-		int screenH = handler.getGame().getHeight();
-		
+	public void render(Graphics g) {		
 		Assets.bkg.render(g);
 		map.render(g);
 		
 		GameInterface.showBreakingCell(g);
+		GameInterface.showFocusedCell(g);
 		em.render(g);
 		
 		GameInterface.render(g);	

@@ -1,6 +1,7 @@
 package entity.machine;
 
 import entity.creature.Player;
+import entity.creature.UserPlayer;
 import gfx.Assets;
 
 public class FuelMachine extends Machine{
@@ -15,7 +16,7 @@ public class FuelMachine extends Machine{
 	@Override
 	protected void onCollision() {
 		if (handler.getGame().getKeyManager().select) {
-			Player player = handler.getPlayer();
+			UserPlayer player = handler.getUserPlayer();
 			
 			if(player.getFuel() < player.getMaxFuel() && player.getMoney() - FUEL_PRICE >= 0) {
 				player.setFuel(player.getFuel() + FUEL_FLOW);

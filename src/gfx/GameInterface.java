@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import org.lwjgl.util.Rectangle;
 
 import entity.creature.Player;
+import entity.creature.UserPlayer;
 import main.Handler;
 import physics.Point;
 import terrain.Cell;
@@ -29,7 +30,7 @@ public class GameInterface {
 	
 	private static void renderMoney(Graphics g, int x, int y) {
 		Handler handler = Handler.getInstance();
-		Player player = handler.getGame().getEntityManager().getPlayer();
+		UserPlayer player = handler.getGame().getEntityManager().getUserPlayer();
 		
 		g.setFont(Assets.font_ka1);
 		g.setColor(Color.WHITE);
@@ -41,7 +42,7 @@ public class GameInterface {
 	public static void showBreakingCell(Graphics g) {
 		Handler handler = Handler.getInstance();
 		FrameTimerManager ftm = handler.getGame().getGameState().getFrameTimerManager();
-		Player player = handler.getGame().getEntityManager().getPlayer();
+		UserPlayer player = handler.getGame().getEntityManager().getUserPlayer();
 		
 		FrameTimer breakTimer = ftm.getFrameTimer(FrameTimerManager.timer.BREAKING);
 		if(breakTimer != null) {
@@ -53,7 +54,22 @@ public class GameInterface {
 			int dispX = (int) (x*Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset());
 			int dispY = (int) (y*Cell.CELLHEIGHT - handler.getGame().getGameCamera().getyOffset());
 			g.drawImage(Assets.breaking[nAnim], dispX, dispY, Cell.CELLWIDTH, Cell.CELLHEIGHT, null);
-		};
+		}
+	}
+
+	public static void showFocusedCell(Graphics g) {
+		Handler handler = Handler.getInstance();
+		UserPlayer player = handler.getGame().getEntityManager().getUserPlayer();
+		
+		Point fCell = player.getFocused();
+		if(player.getFocused() != null) {
+			int x = (int) fCell.getX();
+			int y = (int) fCell.getY();
+			int dispX = (int) (x*Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset());
+			int dispY = (int) (y*Cell.CELLHEIGHT - handler.getGame().getGameCamera().getyOffset());
+			g.setColor(Color.WHITE);
+			g.drawRect(dispX, dispY, Cell.CELLWIDTH, Cell.CELLHEIGHT);
+		}
 	}
 	
 	private static void renderHalo(Graphics g, int radius) {
@@ -61,7 +77,7 @@ public class GameInterface {
 		int screenW = handler.getGame().getWidth();
 		int screenH = handler.getGame().getHeight();
 		
-		Point pos = handler.getGame().getEntityManager().getPlayer().getPosition();
+		Point pos = handler.getGame().getEntityManager().getUserPlayer().getPosition();
 		int x = (int) (pos.getX() - handler.getGame().getGameCamera().getxOffset());
 		int y = (int) (pos.getY() - handler.getGame().getGameCamera().getyOffset());
 		g.drawImage(Assets.gradient, x - radius/2, y - radius/2, radius, radius, null);
@@ -75,7 +91,7 @@ public class GameInterface {
 	
 	private static void renderGuiBars(Graphics g, int x, int y) {
 		Handler handler = Handler.getInstance();
-		Player player = handler.getGame().getEntityManager().getPlayer();
+		UserPlayer player = handler.getGame().getEntityManager().getUserPlayer();
 		
 		int dx = x;
 		renderBar(g, dx, y, "FUEL", Assets.fuelbar, player.getFuel(), player.getMaxFuel());
@@ -98,7 +114,7 @@ public class GameInterface {
 		g.drawImage(Assets.guibarbg, x, y, BARWIDTH, BARHEIGHT, null);
 		
 		float pctFilled = (current/max);
-		if(pctFilled > 0) {
+		if(pctFilled > 0 && pctFilled <= 1) {
 			int barH = (int) (pctFilled * BARHEIGHT);
 			int yP = y + BARHEIGHT - barH;
 			
@@ -108,15 +124,4 @@ public class GameInterface {
 		
 		g.drawImage(Assets.guibar, x, y, BARWIDTH, BARHEIGHT, null);
 	}
-	
-
-	private static BufferedImage crop(BufferedImage src, Rectangle rect) {
-	    BufferedImage dest = new BufferedImage(rect.getWidth(), rect.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
-	    Graphics g = dest.getGraphics();
-	    g.drawImage(src, 0, 0, rect.getWidth(), rect.getHeight(), rect.getX(), rect.getY(), rect.getX() + rect.getWidth(), rect.getY() + rect.getHeight(), null);
-	    g.dispose();
-	    return dest;
-	}
-
-
 }

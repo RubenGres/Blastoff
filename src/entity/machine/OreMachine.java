@@ -1,6 +1,6 @@
 package entity.machine;
 
-import entity.creature.Player;
+import entity.creature.UserPlayer;
 import gfx.Assets;
 
 public class OreMachine extends Machine{
@@ -14,7 +14,7 @@ public class OreMachine extends Machine{
 	@Override
 	protected void onCollision() {
 		if (handler.getGame().getKeyManager().select) {
-			Player player = handler.getPlayer();
+			UserPlayer player = handler.getUserPlayer();
 			player.sellCargo();
 		}
 	}

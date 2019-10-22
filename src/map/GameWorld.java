@@ -11,25 +11,18 @@ import terrain.ore.OreCell;
 import utils.FrameTimerManager;
 
 public class GameWorld {
-
-	public int height, width;
 	
-	private Cell[][] cellMap;
-	private OreCell[][] oreMap;
-	private LiquidCell[][] liquidMap;
-	
+	private Chunk chunk;
+	private int height = Chunk.HEIGHT, width = Chunk.WIDTH;
 	private Handler handler;
 
-	public GameWorld(int width, int height) {
-		this.height = height;
-		this.width = width;
+	public GameWorld() {
 		this.handler = Handler.getInstance();
-		this.cellMap = new Cell[width][height];
-		this.oreMap = new OreCell[width][height];
+		this.chunk = new Chunk();
 	}
 	
 	public void init() {		
-		MapMaker mapmaker = new MapMaker(this, width, height);
+		MapMaker mapmaker = new MapMaker(this, Chunk.WIDTH, Chunk.HEIGHT);
 		mapmaker.generateMap();
 		
 		State.getState().getFrameTimerManager().add(FrameTimerManager.timer.LAVA, true, 30);
@@ -46,18 +39,10 @@ public class GameWorld {
 		// flow x axis
 		for (int y = height-1; y >= 0; y--) {
 			for (int x = 0; x < width; x++) {
-				if(getCell(x,y) instanceof LiquidCell) {
-					((LiquidCell) getCell(x, y)).flow();
+				if(this.chunk.getCell(x,y) instanceof LiquidCell) {
+					((LiquidCell) this.chunk.getCell(x, y)).flow();
 				}
 			}
-		}
-	}
-	
-
-	public void breakCell(int x, int y) {
-		if (!(this.getCell(x, y) instanceof LiquidCell)) {
-			cellMap[x][y] = Cell.empty;
-			oreMap[x][y] = null;
 		}
 	}
 
@@ -71,39 +56,34 @@ public class GameWorld {
 
 		for (int y = yStart; y < yEnd; y++) {
 			for (int x = xStart; x < xEnd; x++) {
-				this.cellMap[x][y].render(g, (int) (x * Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset()),
+				this.chunk.getCell(x, y).render(g, (int) (x * Cell.CELLWIDTH - handler.getGame().getGameCamera().getxOffset()),
 						(int) (y * Cell.CELLHEIGHT - handler.getGame().getGameCamera().getyOffset()), x, y);
 			}
 		}
 	}
 
+	// GETTERS AND SETTERS
+
 	public Cell getCell(int x, int y) {
-		try {
-			return this.cellMap[x][y];
-		} catch (Exception e) {
-			//e.printStackTrace();
-			return Cell.empty;
-		}
+		return this.chunk.getCell(x, y);
 	}
 	
 	public void setCell(int x, int y, Cell cell) {
-		try {
-			cellMap[x][y] = cell;
-		} catch (Exception e) {
-			//e.printStackTrace();
-		}
-	}
-	
-	public OreCell getOreCell(int x, int y) {
-		return this.oreMap[x][y];
+		this.chunk.setCell(x, y, cell);
 	}
 	
 	public void setOreCell(int x, int y, OreCell cell) {
-		oreMap[x][y] = cell;
+		this.chunk.setOreCell(x, y, cell);
 	}
-
-	// GETTERS AND SETTERS
-
+	
+	public OreCell getOreCell(int x, int y) {
+		return this.chunk.getOreCell(x, y);
+	}
+	
+	public void breakCell(int x, int y) {
+		this.chunk.breakCell(x, y);
+	}
+	
 	public int getWidth() {
 		return this.width;
 	}
