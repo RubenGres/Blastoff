@@ -10,16 +10,24 @@ public abstract class State {
 
 	// class
 	protected Handler handler;
+	protected boolean initialized;
 
 	//frametimer manager
 	protected FrameTimerManager ftm;
 	
 	protected State() {
 		this.handler = Handler.getInstance();
-		this.ftm = new FrameTimerManager();
+		this.initialized = false;
 	}
 
 	public static void setState(State state) {
+		if(currentState != null)
+			currentState.stop();
+		
+		if(!state.initialized)
+			state.init();
+		
+		state.prepare();
 		currentState = state;
 	}
 
@@ -30,10 +38,12 @@ public abstract class State {
 	public void tick(){
 		ftm.tick();
 	}
-
-	public FrameTimerManager getFrameTimerManager() {
-		return ftm;
-	}
+	
+	public abstract void init();
+	
+	public abstract void prepare();
 
 	public abstract void render(Graphics g);
+	
+	public abstract void stop();
 }

@@ -41,7 +41,7 @@ public class EntityManager {
 		return rec1.intersects(rec2);
 	}
 	
-	public void tick(){
+	public synchronized void tick(){
 
 		for(Entity e : entities){
 			if(!(e instanceof Player))

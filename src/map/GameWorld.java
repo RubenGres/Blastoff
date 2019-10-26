@@ -25,13 +25,15 @@ public class GameWorld {
 		MapMaker mapmaker = new MapMaker(this, Chunk.WIDTH, Chunk.HEIGHT);
 		mapmaker.generateMap();
 		
-		State.getState().getFrameTimerManager().add(FrameTimerManager.timer.LAVA, true, 30);
+		FrameTimerManager ftm = this.handler.getGame().getGameState().getFrameTimerManager();
+		ftm.add(FrameTimerManager.timer.LAVA, true, 30);
 	}
 
-	public void tick() {		
-		if (!State.getState().getFrameTimerManager().getFrameTimer(FrameTimerManager.timer.LAVA).isRunning()) {
+	public void tick() {
+		FrameTimerManager ftm = this.handler.getGame().getGameState().getFrameTimerManager();
+		if (!ftm.getFrameTimer(FrameTimerManager.timer.LAVA).isRunning()) {
 			flowLiquids();
-			State.getState().getFrameTimerManager().getFrameTimer(FrameTimerManager.timer.LAVA).restart();
+			ftm.getFrameTimer(FrameTimerManager.timer.LAVA).restart();
 		} 
 	}
 
@@ -61,6 +63,11 @@ public class GameWorld {
 			}
 		}
 	}
+	
+	public byte[] asBytes() {
+		return chunk.asBytes();
+	}
+
 
 	// GETTERS AND SETTERS
 

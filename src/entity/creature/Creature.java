@@ -48,7 +48,7 @@ public abstract class Creature extends Entity {
 	public void checkDeath(){
 		
 		if(getHealth()<0){
-			State.setState(handler.getGame().menuState);
+			State.setState(handler.getGame().startMenuState);
 		}
 
 	}

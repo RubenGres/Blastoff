@@ -13,31 +13,13 @@ public class RenderThread extends Thread {
 	// rendering
 	private BufferStrategy bs;
 	private Graphics g;
-	private Display display;
-	public int width = 1000, height = 700;
 	
-	// handler
-	private KeyManager keyManager;
-	private MouseManager mouseManager;
+	public int width, height;	
 	
-	public RenderThread(KeyManager keyManager, MouseManager mouseManager) {
-		this.keyManager = keyManager;
-		this.mouseManager = mouseManager;
-	}
-			
-	private void init() {
-		display = new Display(Game.title, width, height);
-		
-		display.getFrame().addKeyListener(keyManager);
-		display.getFrame().addMouseListener(mouseManager);
-		display.getFrame().addMouseMotionListener(mouseManager);
-		display.getCanvas().addMouseListener(mouseManager);
-		display.getCanvas().addMouseMotionListener(mouseManager);
+	public RenderThread() {
 	}
 	
 	public void run() {
-		init();
-		
 		double timePerTick = 1000000000 / Game.FPS;
 		double delta = 0;
 		long now;
@@ -55,26 +37,32 @@ public class RenderThread extends Thread {
 		}
 	}
 	
-	private void render() {
-		Canvas canvas = display.getCanvas();
+	private synchronized void render() {
+		Display disp = Handler.getInstance().getGame().getDisplay();
+		if(disp.getCanvas().getParent() == null)
+			return;
+		
+		Canvas canvas = disp.getCanvas();
 		this.width = canvas.getWidth();
 		this.height = canvas.getHeight();
-		
-		bs = canvas.getBufferStrategy();
-		if (bs == null) {
+						
+		//du code sale oui, mais du code fonctionnel
+		try {
+			bs = canvas.getBufferStrategy();
+			g = bs.getDrawGraphics();			
+		} catch(Exception e) {
 			canvas.createBufferStrategy(3);
 			return;
 		}
-		g = bs.getDrawGraphics();
 		
 		// Clear Screen
 		g.clearRect(0, 0, width, height);
+		
 		// Draw Here!
-
 		if (states.State.getState() != null)
 			states.State.getState().render(g);
-
 		// End Drawing!
+		
 		bs.show();
 		g.dispose();
 	}
@@ -85,5 +73,5 @@ public class RenderThread extends Thread {
 
 	public int getHeight() {
 		return height;
-	}	
+	}
 }

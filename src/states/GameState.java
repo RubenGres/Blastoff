@@ -2,7 +2,9 @@ package states;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.KeyboardFocusManager;
 
+import display.Display;
 import entity.EntityManager;
 import entity.creature.Player;
 import entity.creature.UserPlayer;
@@ -14,9 +16,12 @@ import entity.pickable.GoldOre;
 import gfx.Assets;
 import gfx.GameCamera;
 import gfx.GameInterface;
+import input.KeyManager;
+import input.MouseManager;
 import main.Handler;
 import map.GameWorld;
 import physics.Point;
+import utils.FrameTimerManager;
 
 public class GameState extends State {
 	
@@ -33,9 +38,26 @@ public class GameState extends State {
 	public GameState() {
 		super();
 		Assets.preload();
+		this.ftm = new FrameTimerManager();
 	}
 	
 	public void init(){
+		
+		/* Listeners */
+		Display display = this.handler.getGame().getDisplay();
+		KeyManager keyManager = this.handler.getGame().getKeyManager();
+		MouseManager mouseManager = this.handler.getGame().getMouseManager();
+		
+		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(keyManager);
+		
+		display.getFrame().addMouseListener(mouseManager);
+		display.getCanvas().addMouseListener(mouseManager);
+		
+		display.getFrame().addMouseMotionListener(mouseManager);
+		display.getCanvas().addMouseMotionListener(mouseManager);	
+		
+		/* world */
 		this.map = new GameWorld();
 		this.map.init();
 		
@@ -47,7 +69,15 @@ public class GameState extends State {
 		em.addEntity(new ShopMachine(400, 20));
 		em.addEntity(new FuelMachine(500, 20));
 		for(int i = 0; i < 100; i++)
-			em.addEntity(new GoldOre(220, 10));   		
+			em.addEntity(new GoldOre(220, 10));
+		
+		this.initialized = true;
+	}
+	
+
+	@Override
+	public void prepare() {
+		this.handler.getGame().startRender();
 	}
 
 	public EntityManager getEntityManager() {
@@ -56,6 +86,9 @@ public class GameState extends State {
 
 	@Override
 	public void tick() {
+		if(handler.getGame().getKeyManager().pause)
+			State.setState(handler.getGame().getPauseMenuState());
+		
 		super.tick();
 		map.tick();
 		em.tick();
@@ -73,12 +106,21 @@ public class GameState extends State {
 		GameInterface.render(g);	
 	}
 	
-	public GameWorld getMap(){
+	public GameWorld getWorld(){
 		return map;
 	}
 
 	public GameCamera getGameCamera() {
 		return gameCamera;
+	}
+	
+	public FrameTimerManager getFrameTimerManager() {
+		return ftm;
+	}
+
+	@Override
+	public void stop() {
+		this.handler.getGame().pauseRender();
 	}
 
 }

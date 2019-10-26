@@ -114,7 +114,7 @@ public class GameInterface {
 		g.drawImage(Assets.guibarbg, x, y, BARWIDTH, BARHEIGHT, null);
 		
 		float pctFilled = (current/max);
-		if(pctFilled > 0 && pctFilled <= 1) {
+		if(pctFilled > 0.02 && pctFilled <= 1) {
 			int barH = (int) (pctFilled * BARHEIGHT);
 			int yP = y + BARHEIGHT - barH;
 			

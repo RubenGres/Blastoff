@@ -50,7 +50,6 @@ public class MouseManager implements MouseListener, MouseMotionListener{
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -59,9 +58,7 @@ public class MouseManager implements MouseListener, MouseMotionListener{
 	}
 
 	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+	public void mouseExited(MouseEvent e) {		
 	}
 
 	@Override

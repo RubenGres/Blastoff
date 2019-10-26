@@ -31,7 +31,7 @@ public class Background {
 		this.speed[z] = f;
 	}
 	
-	public void tick() {	
+	public void updatePos() {	
 		for(int i = 0; i < bg.length; i++) {
 			this.x[i] += this.speed[i];
 			
@@ -42,7 +42,7 @@ public class Background {
 	}
 
 	public void render(Graphics g) {
-		tick();
+		updatePos();
 		
 		Handler handler = Handler.getInstance();
 		int h = handler.getGame().getHeight();

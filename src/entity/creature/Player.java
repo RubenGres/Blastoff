@@ -57,8 +57,8 @@ public class Player extends Creature {
 		BufferedImage frame = Assets.playerIDLE;	
 		
 		//TODO
-		//facingLeft = mm.getMouseX() < x + this.width/2;
-		this.facingLeft = true;
+		facingLeft = mm.getMouseX() < x + this.width/2;
+		//this.facingLeft = true;
 		
 		if(movement.getX() != 0) {
 			frame = this.animation.getCurrentFrame();

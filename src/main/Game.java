@@ -1,23 +1,20 @@
 package main;
 
-import java.awt.Graphics;
-import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
+import java.nio.ByteBuffer;
 
 import display.Display;
 import entity.EntityManager;
-import entity.creature.Player;
-import entity.pickable.PlutoniumOre;
+import entity.creature.UserPlayer;
 import gfx.GameCamera;
 import input.KeyManager;
 import input.MouseManager;
 import map.GameWorld;
 import states.GameState;
-import states.MenuState;
+import states.PauseMenuState;
+import states.StartMenuState;
 import states.State;
 
 public class Game implements Runnable {
@@ -36,7 +33,12 @@ public class Game implements Runnable {
 
 	// States
 	public GameState gameState;
-	public MenuState menuState;
+	public StartMenuState startMenuState;
+	public PauseMenuState pauseMenuState;
+	
+	//display
+	private Display display;
+	public static int DEFAULT_W = 1000, DEFAULT_H = 700;
 
 	public Game(String title, int width, int height) {
 		Game.title = title;
@@ -46,17 +48,17 @@ public class Game implements Runnable {
 	}
 
 	private void init() {
+		display = new Display(Game.title, DEFAULT_W, DEFAULT_H);
+		
 		Handler.getInstance(this);
 		
-		this.gameState = new GameState();
-		this.menuState = new MenuState();
+		this.startMenuState = new StartMenuState();
+		this.pauseMenuState = new PauseMenuState();
 		
-		State.setState(gameState);
-		
-		gameState.init();
+		State.setState(startMenuState);
 	}
 
-	private void tick() {		
+	private synchronized void tick() {
 		keyManager.tick();
 
 		if (State.getState() != null)
@@ -91,8 +93,7 @@ public class Game implements Runnable {
 		tick_thread = new Thread(this);
 		tick_thread.start();
 		
-		render_thread = new RenderThread(keyManager, mouseManager);
-		render_thread.start();
+		render_thread = new RenderThread();
 	}
 
 	public synchronized void stop() {
@@ -106,7 +107,45 @@ public class Game implements Runnable {
 			e.printStackTrace();
 		}
 	}
+	
+	public void startRender() {
+		if(!this.render_thread.isAlive()) {
+			this.render_thread.start();
+		} else if (this.render_thread.isInterrupted()){
+			this.render_thread.notify();
+		} else {
+			this.render_thread.resume();
+		}
+	}
+	
+	public void pauseRender() {
+		this.render_thread.suspend();
+	}
 
+	public void save(String string) throws IOException {
+		String path = "saves/"+string;
+		File file = new File(path);
+		file.mkdir();
+		
+		/* player data */
+	    FileOutputStream playerStream = new FileOutputStream(path + "/player.data");	    
+	    UserPlayer player = this.getEntityManager().getUserPlayer();
+	    ByteBuffer buffer = ByteBuffer.allocate(8);
+	    buffer.putFloat(player.getHealth());	// -> 4 bytes
+	    buffer.putFloat(player.getFuel());		// -> 4 bytes
+	    playerStream.write(buffer.array());
+	    playerStream.close();
+	    
+	    /* world data */
+	    FileOutputStream worldStream = new FileOutputStream(path + "/world.data");
+	    byte[] world = this.getGameState().getWorld().asBytes();
+	    worldStream.write(world);
+	    worldStream.close();
+	    
+	    System.out.println("Saved game !");
+	}
+	
+	/* Getters and setters */
 	public KeyManager getKeyManager() {
 		return keyManager;
 	}
@@ -126,9 +165,17 @@ public class Game implements Runnable {
 	public GameState getGameState() {
 		return gameState;
 	}
+	
+	public void setGameState(GameState gameState) {
+		this.gameState = gameState;
+	}	
 
-	public MenuState getMenuState() {
-		return menuState;
+	public GameWorld getWorld() {
+		return gameState.getWorld();
+	}	
+
+	public StartMenuState getStartMenuState() {
+		return startMenuState;
 	}
 
 	public int getWidth() {
@@ -139,8 +186,12 @@ public class Game implements Runnable {
 		return render_thread.getHeight();
 	}
 
-	public GameWorld getMap() {
-		return gameState.getMap();
+	public Display getDisplay() {
+		return display;
+	}
+
+	public State getPauseMenuState() {
+		return pauseMenuState;
 	}
 
 }

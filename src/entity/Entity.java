@@ -9,8 +9,6 @@ import terrain.Cell;
 import main.Handler;
 
 public abstract class Entity {
-	
-	private final static boolean SHOW_HITBOX = true;
 
 	protected Handler handler;
 

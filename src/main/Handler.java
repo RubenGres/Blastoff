@@ -37,6 +37,6 @@ public class Handler {
 	}
 
 	public GameWorld getWorld() {
-		return game.getMap();
+		return game.getWorld();
 	}
 }
